@@ -114,3 +114,5 @@ html, body, body *, button, a, input, textarea, select, [role="button"] {
 .google-account{font-weight:600;overflow-wrap:anywhere}
 
 .drive-browser{display:flex;flex-direction:column;gap:10px;max-width:100%;padding:12px;border:1px solid var(--line);border-radius:12px}.drive-toolbar{display:flex;gap:8px;align-items:center}.drive-items{max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:6px}.drive-item{background:var(--panel2);padding:8px;border-radius:8px;overflow-wrap:anywhere}.drive-item label{display:flex!important;flex-direction:row!important;align-items:center;gap:8px;cursor:pointer}.drive-item input{width:22px;height:22px;flex:none}.drive-item button{width:100%;text-align:left}
+
+.phone-panel{margin:8px 0;padding:12px;border-radius:12px;background:var(--panel2);text-align:center}.phone-panel img{display:block;margin:0 auto;background:white;padding:8px;border-radius:12px;max-width:100%;object-fit:contain}.phone-panel p{font-size:13px;line-height:1.5;color:var(--muted)}
