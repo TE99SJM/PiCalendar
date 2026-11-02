@@ -20,3 +20,6 @@ __pycache__/
 *credentials*.json
 *client_secret*.json
 *.tar.gz
+
+# Google OAuth device/client files must never be committed
+config/google-oauth-desktop.json

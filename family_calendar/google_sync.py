@@ -28,7 +28,7 @@ def _credentials():
         creds.refresh(Request())
         save_credentials(creds)
     if not creds.valid:
-        raise RuntimeError('Google authorization expired. Run python connect_google.py again.')
+        raise RuntimeError('Google authorization expired. Reconnect from PiCalendar Settings.')
     return creds
 
 
@@ -48,7 +48,7 @@ def _service():
     from googleapiclient.discovery import build
     creds = _credentials()
     if not creds:
-        raise RuntimeError('Google Calendar not connected. Run python connect_google.py on your Pi.')
+        raise RuntimeError('Google Calendar not connected. Sign in from Settings.')
     return build('calendar', 'v3', credentials=creds, cache_discovery=False)
 
 
@@ -104,8 +104,11 @@ def _send_changes(service) -> None:
 def _fetch_calendar_list(service) -> list[str]:
     writable = []
     remote_ids = set()
+    account = ''
     for item in _all_pages(service.calendarList().list, 'items'):
         cal_id = item['id']
+        if item.get('primary'):
+            account = cal_id
         remote_ids.add(cal_id)
         can_edit = item.get('accessRole') in ('owner', 'writer')
         name = item.get('summaryOverride') or item.get('summary', 'Google Calendar')
@@ -117,6 +120,8 @@ def _fetch_calendar_list(service) -> list[str]:
             ''', (cal_id, name, color, int(can_edit)))
         if can_edit:
             writable.append(cal_id)
+    if account:
+        set_settings({'google_account': account})
     return list(remote_ids)
 
 
@@ -161,6 +166,16 @@ def _download_events(service, cal_id: str, time_min: str, time_max: str) -> None
         for row in rows:
             if row['google_event_id'] not in downloaded:
                 con.execute('DELETE FROM events WHERE id=?', (row['id'],))
+
+
+def disconnect_google() -> None:
+    """Clear account authorization and remote cache, preserving local events."""
+    with _SYNC_LOCK:
+        TOKEN_FILE.unlink(missing_ok=True)
+        with db() as con:
+            con.execute("DELETE FROM events WHERE calendar_id != 'local'")
+            con.execute("DELETE FROM calendars WHERE id != 'local'")
+        set_settings({'google_account': '', 'last_sync': '', 'last_history_sync': '', 'last_error': ''})
 
 
 def sync_google() -> dict:

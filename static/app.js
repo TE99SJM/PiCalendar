@@ -194,14 +194,15 @@ function renderSettings(){
   $('weather-longitude').value=state.settings.weather_longitude||'';
   const st=state.status;
   const ready=st.google_client_configured;
+  const account=state.settings.google_account||'';
   $('google-connection').innerHTML=`<strong>${st.google_connected?'✓ Google Calendar connected':'Google Calendar not connected'}</strong>
-    <p>${st.google_connected?'Add or change events on this display and they will sync both ways with Google Calendar about every five minutes when online.':'Connect your account to see and edit Google events. Your local calendar works without Wi-Fi.'}</p>
-    ${st.last_error?`<p style="color:#ffadad">${esc(st.last_error)}</p>`:''}
-    ${!ready?`<div class="google-connection-help">One-time setup: <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener" style="color:#b6dcfa">Create a Google OAuth Desktop client</a>, enable the Calendar API, and download its JSON file. Then choose that file below. No Google password is stored here.</div>
-       <label class="google-oauth-upload">OAuth client JSON file<input type="file" id="google-client-file" accept=".json,application/json" /></label>`:''}
+    ${account&&st.google_connected?`<p class="google-account">${esc(account)}</p>`:''}
+    <p>${st.google_connected?'Events sync both ways with Google Calendar when online.':'Connect your Google account to display and edit events. Local calendars work offline.'}</p>
+    ${st.last_error?`<p class="google-error">${esc(st.last_error)}</p>`:''}
+    ${!ready?'<p class="google-connection-help">Google Sign-In has not been enabled by the PiCalendar publisher. Local calendars still work.</p>':''}
     <div class="google-login-actions">
-      ${ready?'<button type="button" class="btn btn-primary" id="settings-google-login">'+(st.google_connected?'Reconnect Google account':'Sign in with Google')+'</button>':''}
-      ${st.google_connected?'<button type="button" class="btn btn-secondary" id="settings-sync">Sync now</button>':''}
+      <button type="button" class="btn btn-primary" id="settings-google-login" ${!ready?'disabled title="Google sign-in not provisioned"':''}>${st.google_connected?'Reconnect Google account':'Sign in with Google'}</button>
+      ${st.google_connected?'<button type="button" class="btn btn-secondary" id="settings-sync">Sync now</button><button type="button" class="btn btn-secondary" id="settings-google-disconnect">Sign out</button>':''}
     </div>`;
   $('calendar-settings').innerHTML=state.calendars.map(c=>`<label class="cal-setting"><input type="checkbox" data-calendar="${esc(c.id)}" ${c.selected?'checked':''} ${c.id==='local'?'disabled':''}><span class="cal-dot" style="background:${validColor(c.color)}"></span>${esc(c.name)}${c.editable?'':' (read only)'}</label>`).join('');
   renderPhotoSettings();
@@ -373,15 +374,14 @@ function eventListeners(){
       }
     });
   });
-  $('google-connection').addEventListener('change',e=>run(async()=>{
-    if(e.target.id!=='google-client-file'||!e.target.files?.length)return;
-    const file=e.target.files[0];
-    if(file.size>32_000){toast('OAuth JSON file is too large.');return;}
-    const body=new FormData();body.append('file',file);
-    await api('/api/google/client',{method:'POST',body});
-    state.status=await api('/api/status');renderSettings();
-    toast('Google client configured. Tap Sign in with Google.');
-  }));
+  $('google-connection').addEventListener('click',e=>{
+    if(e.target.id!=='settings-google-disconnect')return;
+    if(!window.confirm('Disconnect Google Calendar from this device? Local entries will remain.'))return;
+    run(async()=>{
+      await api('/api/google/disconnect',{method:'POST'});
+      await getEverything();renderSettings();toast('Google Calendar disconnected.');
+    });
+  });
   $('calendar-settings').addEventListener('change',e=>run(async()=>{
     if(!e.target.dataset.calendar)return;
     await api(`/api/calendars/${encodeURIComponent(e.target.dataset.calendar)}?selected=${e.target.checked}`,{method:'PATCH'});

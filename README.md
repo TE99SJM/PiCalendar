@@ -1,4 +1,6 @@
-> **Current release: PiCalendar v0.3.1.** For the no-desktop boot, animated swipes, and Google login directly from Settings, follow **README-v0.3.1.md**. This older document describes the original installation and optional terminal-based OAuth flow.
+> **Current development branch: PiCalendar v0.3.3.** See [README-v0.3.3.md](README-v0.3.3.md) for Google Sign-In in Settings. The publisher must configure the Google OAuth client once; no end-user token or client JSON setup is needed.
+
+> **Previous release: PiCalendar v0.3.1.** For the no-desktop boot, animated swipes, and Google login directly from Settings, follow **README-v0.3.1.md**. This older document describes the original installation and optional terminal-based OAuth flow.
 
 # PiCalendar v0.3
 

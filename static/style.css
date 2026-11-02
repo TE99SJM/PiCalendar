@@ -99,3 +99,10 @@ body.screen-sleeping #app,body.screen-sleeping #toast{visibility:hidden}
   z-index: 1;
   pointer-events: none;
 }
+
+/* v0.3.3 sign-in controls */
+.google-login-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;align-items:center}
+.google-login-actions .btn{flex:1;min-width:140px}
+.google-connection-help{margin-top:10px}
+.google-error{color:#ffadad}
+.google-account{font-weight:600;overflow-wrap:anywhere}
