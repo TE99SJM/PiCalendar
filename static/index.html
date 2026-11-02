@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0d1727">
+  <title>PiCalendar</title>
+  <link rel="icon" type="image/png" href="/static/logo.png">
+  <link rel="stylesheet" href="/static/style.css?v=0.3.2">
+  <script defer src="/static/app.js"></script>
+  <link rel="stylesheet" href="/static/touch-gestures.css?v=1.2.1">
+  <script defer src="/static/touch-gestures.js?v=1.2.1"></script>
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="logo"><div class="logo-square"><img src="/static/logo.png" alt="PiCalendar" draggable="false"></div><div><h1 id="family-name">Our Family</h1><span class="subtitle" id="date-long">Family dashboard</span></div></div>
+      <div class="header-info"><div id="weather" class="weather"></div><div class="clock" id="clock"></div></div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" id="sync-button" title="Sync Google Calendar">↻ <span class="wide-text">Sync</span></button>
+        <button class="btn btn-secondary icon-btn" id="sleep-button" title="Put screen to sleep" aria-label="Sleep screen">⏻</button>
+        <button class="btn btn-secondary icon-btn" id="settings-button" title="Settings" aria-label="Settings">⚙</button>
+        <button class="btn btn-primary" id="add-event-button">＋ Event</button>
+      </div>
+    </header>
+    <main class="dashboard">
+      <section class="calendar-panel">
+        <div class="calendar-toolbar">
+          <div class="month-controls"><button class="icon-btn btn btn-secondary" id="prev" aria-label="Previous">‹</button><button class="btn btn-secondary" id="today">Today</button><button class="icon-btn btn btn-secondary" id="next" aria-label="Next">›</button><h2 id="month-title"></h2></div>
+          <div class="view-controls"><button class="btn view-btn active" id="view-month">Month</button><button class="btn view-btn" id="view-week">Week</button></div>
+        </div>
+        <div class="weekdays"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+        <div id="calendar-viewport" class="calendar-viewport"><div class="calendar-grid" id="calendar-grid"></div></div>
+        <div class="calendar-bottom"><span id="sync-status" class="sync-status">● Local calendar ready</span><span>Tap a day for details • Tap an event to edit</span></div>
+      </section>
+      <aside class="sidebar">
+        <section class="side-card agenda-card">
+          <div class="section-title"><div><span class="eyebrow">YOUR SCHEDULE</span><h3 id="selected-date-title">Today</h3></div><button class="small-action" id="add-day-event" title="Add event">＋</button></div>
+          <div id="agenda-list" class="agenda-list"></div>
+        </section>
+        <section class="side-card chore-card">
+          <div class="section-title"><div><span class="eyebrow">KEEP THINGS MOVING</span><h3>Family chores</h3></div><button class="small-action" id="add-chore" title="Add chore">＋</button></div>
+          <div id="chore-list" class="task-list"></div>
+        </section>
+        <section class="side-card shopping-card">
+          <div class="section-title"><div><span class="eyebrow">DON'T FORGET</span><h3>Shopping list</h3></div><button class="small-action" id="add-grocery" title="Add item">＋</button></div>
+          <div id="shopping-list" class="task-list"></div>
+        </section>
+        <section class="side-card meals-card">
+          <div class="section-title"><div><span class="eyebrow">WHAT'S COOKING</span><h3>Meal plan</h3></div><button class="small-action" id="edit-meal" title="Edit meal">✎</button></div>
+          <div id="meal-list"></div>
+        </section>
+        <section class="side-card photo-card"><div class="photo-container" id="photo-container"><div class="photo-empty">📷<br><small>Add photos in Settings</small></div></div></section>
+      </aside>
+    </main>
+  </div>
+  <dialog id="event-dialog" class="dialog"><form id="event-form" class="dialog-form">
+    <div class="dialog-head"><h2 id="event-dialog-title">New event</h2><button type="button" class="close-btn" data-close="event-dialog" aria-label="Close">×</button></div>
+    <label>Event name<input id="event-title" type="text" maxlength="200" placeholder="What's happening?" required></label>
+    <label>Calendar<select id="event-calendar"></select></label>
+    <label class="checkline"><input type="checkbox" id="event-all-day"> All-day event</label>
+    <div class="form-two"><label>Starts<input id="event-start-date" type="date" required></label><label class="time-input" id="start-time-label">Time<input id="event-start-time" type="time" value="09:00"></label></div>
+    <div class="form-two"><label>Ends<input id="event-end-date" type="date" required></label><label class="time-input" id="end-time-label">Time<input id="event-end-time" type="time" value="10:00"></label></div>
+    <label>Notes (optional)<textarea id="event-description" rows="2" placeholder="Details, address, reminders..."></textarea></label>
+    <div class="dialog-actions"><button type="button" id="delete-event" class="btn btn-danger hidden">Delete</button><div class="spacer"></div><button type="button" data-close="event-dialog" class="btn btn-secondary">Cancel</button><button type="submit" class="btn btn-primary">Save event</button></div>
+  </form></dialog>
+  <dialog id="chore-dialog" class="dialog"><form id="chore-form" class="dialog-form">
+    <div class="dialog-head"><h2>Add chore</h2><button type="button" class="close-btn" data-close="chore-dialog">×</button></div>
+    <label>Chore<input id="chore-title" placeholder="Take out the trash" maxlength="150" required></label>
+    <label>Person (optional)<input id="chore-assignee" placeholder="Who is responsible?" maxlength="60"></label>
+    <label>Repeat<select id="chore-repeat"><option value="once">One time</option><option value="daily">Every day</option><option value="weekly">Every week</option></select></label>
+    <div class="dialog-actions"><div class="spacer"></div><button type="button" data-close="chore-dialog" class="btn btn-secondary">Cancel</button><button type="submit" class="btn btn-primary">Add chore</button></div>
+  </form></dialog>
+  <dialog id="grocery-dialog" class="dialog"><form id="grocery-form" class="dialog-form">
+    <div class="dialog-head"><h2>Add shopping item</h2><button type="button" class="close-btn" data-close="grocery-dialog">×</button></div>
+    <label>Item<input id="grocery-title" placeholder="Milk, eggs, ..." maxlength="150" required></label>
+    <div class="dialog-actions"><div class="spacer"></div><button type="button" data-close="grocery-dialog" class="btn btn-secondary">Cancel</button><button type="submit" class="btn btn-primary">Add item</button></div>
+  </form></dialog>
+  <dialog id="meal-dialog" class="dialog"><form id="meal-form" class="dialog-form">
+    <div class="dialog-head"><h2>Plan a meal</h2><button type="button" class="close-btn" data-close="meal-dialog">×</button></div>
+    <label>Day<input id="meal-date" type="date" required></label>
+    <label>Meal<textarea id="meal-name" rows="2" maxlength="200" placeholder="Tacos, roast chicken, leftovers..."></textarea></label>
+    <p class="hint">Clear the name to remove a meal.</p>
+    <div class="dialog-actions"><div class="spacer"></div><button type="button" data-close="meal-dialog" class="btn btn-secondary">Cancel</button><button type="submit" class="btn btn-primary">Save meal</button></div>
+  </form></dialog>
+  <dialog id="settings-dialog" class="dialog settings-dialog"><form id="settings-form" class="dialog-form">
+    <div class="dialog-head"><h2>⚙ Dashboard settings</h2><button type="button" class="close-btn" data-close="settings-dialog">×</button></div>
+    <label>Display name<input id="settings-family" maxlength="70" required></label>
+    <h3>Google Calendar</h3>
+    <div id="google-connection" class="information-box"></div>
+    <div id="calendar-settings" class="calendar-settings"></div>
+    <h3>Local weather (optional)</h3>
+    <label>Location name<input id="weather-location" placeholder="St. Cloud, MN" maxlength="100"></label>
+    <div class="form-two"><label>Latitude<input id="weather-latitude" placeholder="45.56" type="number" step="any" min="-90" max="90"></label><label>Longitude<input id="weather-longitude" placeholder="-94.16" type="number" step="any" min="-180" max="180"></label></div>
+    <p class="hint">Weather uses Open-Meteo without an API key. Leave coordinates blank to hide.</p>
+    <h3>Family photos</h3>
+    <label class="upload-zone">＋ Upload photos<input id="photo-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden></label>
+    <div id="photo-settings" class="photo-settings"></div>
+    <div class="dialog-actions"><div class="spacer"></div><button type="button" data-close="settings-dialog" class="btn btn-secondary">Close</button><button type="submit" class="btn btn-primary">Save settings</button></div>
+  </form></dialog>
+  <!-- A full-screen touch target stays alive so double taps can wake the display. -->
+  <div id="sleep-overlay" role="button" tabindex="0" aria-label="Display asleep. Double tap to wake."></div>
+  <div id="toast" class="toast" role="status"></div>
+</body>
+</html>

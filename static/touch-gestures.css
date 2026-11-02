@@ -1,0 +1,25 @@
+/* PiCalendar 1.2.1: touch navigation for kiosk touchscreens, including devices
+   that emulate a mouse. The app still allows selecting text in edit fields. */
+html, body, #app, #app * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+input, textarea, [contenteditable="true"] {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+* { scrollbar-width: none !important; }
+*::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+.logo-square { padding: 0 !important; background: transparent !important; overflow: hidden; }
+.logo-square img { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+/* We handle finger movement ourselves. On some Pi touch displays gestures
+   generate mouse rather than touch events, so native CSS scrolling is not enough. */
+.sidebar, .dialog-form { touch-action: none !important; overflow-y: auto !important; overscroll-behavior: contain; min-height: 0 !important; }
+.sidebar *, .dialog-form * { touch-action: none !important; }
+#calendar-grid, #calendar-grid * { touch-action: none !important; -webkit-user-drag: none !important; }
+/* Preserve typing and accessibility of the on-screen keyboard. */
+input, textarea, select, [contenteditable="true"] { touch-action: manipulation !important; }
+@media(max-width:800px) {
+  .sidebar { display:flex !important; flex-direction:column !important; overflow-y:auto !important; min-height:250px !important; max-height:72dvh !important; }
+}

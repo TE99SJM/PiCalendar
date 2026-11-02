@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=PiCalendar
+Description=PiCalendar silent boot logo (real loading bar follows when the app starts)
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/picalendar
+ScriptFile=/usr/share/plymouth/themes/picalendar/picalendar.script

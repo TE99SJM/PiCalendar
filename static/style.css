@@ -1,0 +1,101 @@
+:root{--bg:#101825;--panel:#1a2638;--panel2:#202f43;--panel3:#273950;--line:#324258;--text:#eef4fc;--muted:#98a9c0;--accent:#79bbef;--accent2:#b6dcfa;--green:#6ed5aa;--red:#ff9197;--radius:19px;color-scheme:dark;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text)}body{overflow:hidden}button,input,select,textarea{font:inherit}button{cursor:pointer;touch-action:manipulation}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}#app{height:100dvh;display:flex;flex-direction:column;padding:18px 20px 13px;gap:18px;background:radial-gradient(circle at 80% -10%,#213954 0,transparent 37%),var(--bg)}
+.topbar{display:flex;align-items:center;gap:22px;min-height:65px}.logo{display:flex;align-items:center;gap:13px;min-width:240px}.logo-square{display:grid;place-items:center;height:53px;width:53px;flex-shrink:0;font-size:27px;background:linear-gradient(135deg,#8bc7f0,#5f94df);border-radius:17px;color:#0f2234}.logo h1{font-size:24px;line-height:1.1;margin:0;font-weight:760;letter-spacing:-.6px}.subtitle{display:block;font-size:12px;color:var(--muted);margin-top:5px}.header-info{margin-left:auto;display:flex;align-items:center;gap:24px}.weather{white-space:nowrap;font-size:16px;color:var(--accent2)}.weather small{display:block;color:var(--muted);font-size:12px}.clock{font-weight:730;font-size:28px;white-space:nowrap;letter-spacing:-1px}.header-actions{display:flex;align-items:center;gap:9px}.btn{border:0;border-radius:12px;padding:11px 16px;min-height:44px;font-size:15px;font-weight:670;color:var(--text)}.btn-secondary{background:var(--panel2);border:1px solid var(--line)}.btn-primary{background:var(--accent);color:#122336}.btn-danger{background:#583036;color:#ffbabe}.icon-btn{width:46px;padding:8px;font-size:26px;line-height:1;display:grid;place-items:center}.btn:active,.small-action:active{transform:scale(.97)}
+.dashboard{display:grid;grid-template-columns:minmax(0,1fr) minmax(295px,340px);gap:16px;min-height:0;flex:1}.calendar-panel{background:var(--panel);border-radius:var(--radius);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;min-width:0;min-height:0}.calendar-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:17px}.month-controls,.view-controls{display:flex;align-items:center;gap:9px}.month-controls h2{font-size:23px;letter-spacing:-.45px;font-weight:750;margin:0 0 0 8px;white-space:nowrap}.view-controls{padding:4px;background:#132033;border-radius:13px}.view-btn{background:none;color:var(--muted);padding:8px 15px;min-height:36px}.view-btn.active{background:#34506e;color:var(--text)}.weekdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));color:var(--muted);text-transform:uppercase;letter-spacing:.9px;font-size:11px;font-weight:750;text-align:center;padding-bottom:10px}.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);flex:1;gap:5px;min-height:0}.day-cell{min-width:0;min-height:0;padding:8px 5px;background:#1e2c40;border-radius:9px;position:relative;display:flex;flex-direction:column;gap:5px;border:2px solid transparent;overflow:hidden}.day-cell.other{opacity:.37}.day-cell.selected{border-color:#81bbeb;background:#263f58}.day-cell.today .day-number{background:#88bff0;color:#0a2036}.day-number{font-size:13px;font-weight:760;display:grid;place-items:center;width:29px;height:29px;border-radius:50%;flex-shrink:0}.day-head{display:flex;justify-content:space-between;align-items:center;min-height:26px}.day-head .dot{font-size:11px;color:var(--green)}.day-events{display:flex;flex-direction:column;gap:4px;overflow:hidden;min-height:0}.event-pill{background:#476383;border:0;border-left:4px solid #8cc9fb;text-align:left;color:var(--text);font-size:11px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:5px;min-height:23px;padding:4px 5px;width:100%}.more-events{font-size:11px;color:var(--muted);padding:0 5px}.calendar-bottom{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:10px;margin-top:11px}.sync-status{color:var(--green)}.sync-status.error{color:var(--red)}
+.sidebar{display:flex;flex-direction:column;gap:12px;overflow-y:auto;min-width:0;padding-bottom:2px;scrollbar-width:thin}.side-card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:14px 16px;flex-shrink:0}.section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}.eyebrow{font-size:10px;font-weight:780;letter-spacing:1.5px;color:#86bceb}.section-title h3{margin:3px 0 0;font-size:18px;letter-spacing:-.3px}.small-action{background:var(--panel3);border:1px solid #4c6781;border-radius:11px;color:var(--accent2);width:36px;height:36px;font-size:24px;line-height:1}.agenda-list,.task-list{display:flex;flex-direction:column;gap:7px}.agenda-event{display:flex;gap:9px;align-items:stretch;width:100%;border:0;text-align:left;background:var(--panel2);color:var(--text);padding:9px;border-radius:9px}.agenda-stripe{border-left:4px solid var(--accent);border-radius:4px}.agenda-event strong{display:block;font-size:13px}.agenda-event small{display:block;font-size:11px;color:var(--muted);margin-top:3px}.empty-state{color:var(--muted);font-size:12px;padding:9px 0}.task-row{display:flex;align-items:center;gap:8px;min-height:32px}.task-row input{appearance:none;flex-shrink:0;width:22px;height:22px;border:2px solid #6d849d;border-radius:7px;background:#122235;margin:0}.task-row input:checked{border-color:var(--green);background:var(--green)}.task-row input:checked:before{content:'✓';color:#10202f;display:grid;place-items:center;font-weight:800}.task-copy{flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.task-copy.checked{text-decoration:line-through;color:var(--muted)}.task-copy small{font-size:11px;color:var(--muted)}.delete-small{background:none;color:#8192a8;border:0;font-size:18px;padding:5px 7px}.meal-row{display:flex;justify-content:space-between;align-items:center;text-align:left;gap:8px;width:100%;border:0;background:var(--panel2);color:var(--text);border-radius:8px;padding:10px 11px;margin-top:6px;font-size:12px}.meal-row span{color:var(--muted);min-width:45px}.meal-row strong{font-weight:640;text-align:right;overflow:hidden;text-overflow:ellipsis}.photo-card{padding:5px;overflow:hidden}.photo-container{height:160px;display:grid;place-items:center;background:#152438;border-radius:13px;overflow:hidden}.photo-container img{width:100%;height:100%;object-fit:cover}.photo-empty{text-align:center;color:var(--muted);line-height:1.6;font-size:24px}.photo-empty small{font-size:12px}
+.dialog{width:min(95vw,520px);max-height:92dvh;background:#1c293b;color:var(--text);border:1px solid #50647c;border-radius:21px;padding:0;box-shadow:0 25px 80px #0009}.dialog::backdrop{background:#080f1bc9;backdrop-filter:blur(4px)}.dialog-form{padding:22px;display:flex;flex-direction:column;gap:15px;max-height:92dvh;overflow-y:auto}.dialog-head{display:flex;justify-content:space-between;align-items:center}.dialog-head h2{margin:0;font-size:22px}.close-btn{background:none;border:0;color:var(--muted);font-size:30px}.dialog label:not(.checkline):not(.upload-zone){display:flex;flex-direction:column;gap:7px;color:#d2dcea;font-size:13px;font-weight:660}.dialog input:not([type=checkbox]):not([type=file]),.dialog textarea,.dialog select{width:100%;background:#111f30;border:1px solid #465b70;color:var(--text);border-radius:11px;min-height:45px;padding:11px;font-size:16px}.dialog textarea{resize:vertical}.form-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.checkline{display:flex;align-items:center;gap:9px;font-size:15px}.checkline input{width:21px;height:21px;accent-color:#74b8eb}.dialog-actions{display:flex;gap:9px;margin-top:6px;align-items:center}.spacer{flex:1}.hidden{display:none!important}.hint{font-size:12px;color:var(--muted);margin:-4px 0}.settings-dialog{width:min(95vw,590px)}.settings-dialog h3{font-size:16px;margin:7px 0 0}.information-box{background:var(--panel2);border-radius:11px;padding:12px;color:var(--muted);font-size:13px;line-height:1.55}.information-box strong{color:var(--text)}.information-box code{color:var(--accent2);font-size:12px;overflow-wrap:anywhere}.calendar-settings{display:flex;flex-direction:column;gap:7px}.cal-setting{display:flex;align-items:center;gap:9px;font-size:13px}.cal-setting input{width:18px;height:18px;accent-color:#8cc4ef}.cal-dot{width:11px;height:11px;border-radius:50%}.upload-zone{background:var(--panel3);padding:13px 16px;text-align:center;border-radius:11px;border:1px dashed #7293b4;cursor:pointer;font-weight:670;color:var(--accent2)}.photo-settings{display:flex;gap:7px;flex-wrap:wrap}.photo-preview{width:72px;height:60px;position:relative;border-radius:7px;overflow:hidden}.photo-preview img{width:100%;height:100%;object-fit:cover}.photo-preview button{position:absolute;right:0;top:0;border:0;background:#0c1724df;color:white;font-size:16px;width:25px;height:25px}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%) translateY(80px);background:#365a79;color:white;border-radius:11px;padding:12px 20px;font-weight:650;opacity:0;pointer-events:none;transition:.2s;z-index:1000;max-width:85%;text-align:center}.toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(min-width:1700px){.dashboard{grid-template-columns:minmax(0,1fr) 390px}.sidebar{gap:14px}.side-card{padding:17px}.day-cell{padding:11px 8px}.event-pill{font-size:13px;min-height:26px}}
+@media(max-width:1200px){#app{padding:12px;gap:11px}.dashboard{grid-template-columns:minmax(0,1fr) 290px;gap:10px}.header-info{gap:10px}.logo{min-width:200px}.calendar-toolbar{flex-wrap:wrap}.month-controls h2{font-size:18px}.calendar-panel{padding:11px}.day-cell{padding:4px 2px}.event-pill{font-size:10px}}
+@media(max-width:800px){body{overflow:auto}#app{height:auto;min-height:100dvh}.topbar{flex-wrap:wrap;gap:9px}.header-info{margin-left:auto}.header-actions{width:100%;justify-content:flex-end}.dashboard{grid-template-columns:1fr}.calendar-panel{min-height:620px}.sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible}.photo-container{height:180px}.clock{font-size:22px}}
+@media(max-width:540px){.topbar .logo h1{font-size:20px}.logo{min-width:0}.logo-square{height:43px;width:43px}.weather{font-size:13px}.calendar-panel{min-height:580px}.month-controls{gap:3px}.month-controls h2{font-size:17px}.calendar-toolbar{gap:8px}.view-controls{margin-left:auto}.day-number{font-size:12px}.event-pill{font-size:9px;padding:3px;min-height:21px}.calendar-bottom span:last-child{display:none}.sidebar{grid-template-columns:1fr}.form-two{grid-template-columns:1fr}.dialog-form{padding:16px}}
+
+/* Touch-friendly display sleep. The black screen is intentionally 100% opaque. */
+#sleep-button{font-family:system-ui,sans-serif;font-size:27px}
+#sleep-overlay{display:none;position:fixed;inset:0;background:#000;z-index:9999;cursor:default;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+#sleep-overlay.sleeping{display:block}
+body.screen-sleeping #app,body.screen-sleeping #toast{visibility:hidden}
+
+/* 0.3.1 animated month/week transition: viewport prevents panels sliding over sidebar */
+.calendar-viewport{position:relative;display:flex;flex:1;min-height:0;overflow:hidden;isolation:isolate}
+.calendar-viewport > .calendar-grid{width:100%;height:100%;min-height:0;flex:1;will-change:transform}
+.calendar-slide-ghost{position:absolute!important;inset:0;z-index:5;pointer-events:none;flex:none!important;overflow:hidden}
+@media(prefers-reduced-motion:reduce){.calendar-viewport > .calendar-grid{will-change:auto}}
+/* Setup from the touchscreen: all actions large enough for fingers. */
+.google-login-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;align-items:center}
+.google-login-actions .btn{flex:1;min-width:140px}
+.google-oauth-upload{display:block;margin-top:10px!important;cursor:pointer}
+.google-connection-help{margin-top:10px}
+
+
+/* v0.3.2: Force the moving month layers to stay within their calendar area.
+   On Chromium/Wayland, overflow:hidden alone may not clip composited slides. */
+.calendar-panel {
+  overflow: hidden;
+  isolation: isolate;
+  contain: paint;
+}
+.calendar-viewport {
+  display: block;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 0%;
+  overflow: hidden;
+  isolation: isolate;
+  contain: layout paint;
+  clip-path: inset(0);
+}
+.calendar-viewport > .calendar-grid,
+.calendar-viewport > .calendar-slide-ghost {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  flex: none !important;
+}
+.calendar-viewport > .calendar-grid { z-index: 2; }
+.calendar-viewport > .calendar-slide-ghost {
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* PiCalendar v0.3.2 -- strict containment for horizontal month animation.
+   Chromium on Raspberry Pi may composite moving grids outside overflow:hidden
+   flex children. Paint containment + explicit layer bounds prevent that. */
+.calendar-panel {
+  overflow: hidden;
+  isolation: isolate;
+  contain: paint;
+}
+.calendar-viewport {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 0%;
+  overflow: hidden;
+  isolation: isolate;
+  contain: layout paint;
+  clip-path: inset(0);
+}
+.calendar-viewport > .calendar-grid,
+.calendar-viewport > .calendar-slide-ghost {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  flex: none !important;
+}
+.calendar-viewport > .calendar-grid {
+  z-index: 2;
+}
+.calendar-viewport > .calendar-slide-ghost {
+  z-index: 1;
+  pointer-events: none;
+}

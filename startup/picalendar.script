@@ -1,0 +1,6 @@
+Window.SetBackgroundTopColor(0, 0, 0);
+Window.SetBackgroundBottomColor(0, 0, 0);
+logo_image = Image("picalendar-logo.png");
+logo_sprite = Sprite(logo_image);
+logo_sprite.SetPosition(Window.GetWidth()/2 - logo_image.GetWidth()/2,
+                        Window.GetHeight()/2 - logo_image.GetHeight()/2, 100);
