@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#0d1727">
   <title>PiCalendar</title>
   <link rel="icon" type="image/png" href="/static/logo.png">
-  <link rel="stylesheet" href="/static/style.css?v=0.5.2">
-  <script defer src="/static/app.js?v=0.5.2"></script>
+  <link rel="stylesheet" href="/static/style.css?v=0.5.3">
+  <script defer src="/static/app.js?v=0.5.3"></script>
   <link rel="stylesheet" href="/static/touch-gestures.css?v=1.2.1">
   <script defer src="/static/touch-gestures.js?v=1.2.1"></script>
 </head>
@@ -94,6 +94,10 @@
     <div class="form-two"><label>Latitude<input id="weather-latitude" placeholder="45.56" type="number" step="any" min="-90" max="90"></label><label>Longitude<input id="weather-longitude" placeholder="-94.16" type="number" step="any" min="-180" max="180"></label></div>
     <p class="hint">Weather uses Open-Meteo without an API key. Leave coordinates blank to hide.</p>
     <h3>Family photos</h3>
+    <button type="button" class="btn btn-secondary" id="phone-start">Send photos from iPhone</button>
+    <div id="phone-panel" class="phone-panel hidden"><img id="phone-qr" alt="Scan QR with iPhone camera" width="200" height="200">
+    <p>Scan with your iPhone camera while connected to the same Wi-Fi. Expires after 15 minutes.</p>
+    <button type="button" class="btn btn-secondary" id="phone-stop">Close transfer</button></div>
     <button type="button" class="btn btn-secondary" id="drive-connect">Connect Google Drive</button>
     <button type="button" class="btn btn-secondary hidden" id="drive-disconnect">Disconnect Drive</button>
     <div id="drive-browser" class="drive-browser hidden">
