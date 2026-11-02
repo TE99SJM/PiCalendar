@@ -2,6 +2,9 @@
 # Run as the normal Pi desktop user, never with sudo.
 set -euo pipefail
 cd "$(dirname "$0")"
+# Ensure launchers are executable even when installed from a GitHub ZIP.
+# ZIP downloads and copies can lose POSIX executable mode bits.
+chmod u+x run.sh run-kiosk.sh startup/launch-console-kiosk.sh
 if [[ "${EUID}" -eq 0 ]]; then
   echo 'Run this as your normal Raspberry Pi user, without sudo.'
   exit 1
