@@ -8,25 +8,19 @@
 #splash{position:fixed;inset:0;background:#000;display:grid;place-items:center;z-index:2;transition:opacity .18s ease}
 /* One-third the previous boot logo display size; central positioning. */
 .logo{display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(16vw,17.3vh,147px);height:auto;object-fit:contain}
-.track{position:absolute;left:50%;transform:translateX(-50%);bottom:clamp(20px,6vh,75px);width:min(55vw,620px);height:8px;background:#1c2b3b;border-radius:40px;overflow:hidden}
-#fill{width:0;height:100%;border-radius:40px;background:linear-gradient(90deg,#2987ee,#35d8f8);transition:width .22s ease}
-@media(orientation:portrait){.logo{width:min(23.3vw,15vh,153px)}.track{width:74vw}}
-@media(prefers-reduced-motion:reduce){#splash,#fill{transition:none}}
+@media(orientation:portrait){.logo{width:min(23.3vw,15vh,153px)}}
+@media(prefers-reduced-motion:reduce){#splash{transition:none}}
 </style></head><body>
 <iframe title="PiCalendar family dashboard" id="calendar-frame" loading="eager"></iframe>
 <main id="splash" aria-label="Opening PiCalendar">
 <img class="logo" src="/logo.png" alt="PiCalendar logo">
-<div class="track" id="progress" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="fill"></div></div>
 </main>
 <script>
 (() => {
  const frame=document.getElementById('calendar-frame');
  const splash=document.getElementById('splash');
- const progress=document.getElementById('progress');
- const fill=document.getElementById('fill');
  let frameStarted=false, finished=false, appOrigin='';
- function update(value){const pct=Math.min(100,Math.max(0,Math.round(value)));fill.style.width=pct+'%';progress.setAttribute('aria-valuenow',String(pct));}
- function reveal(){if(finished)return;finished=true;update(100);frame.style.opacity='1';frame.style.pointerEvents='auto';splash.style.opacity='0';setTimeout(()=>splash.remove(),200);}
+ function reveal(){if(finished)return;finished=true;frame.style.opacity='1';frame.style.pointerEvents='auto';splash.style.opacity='0';setTimeout(()=>splash.remove(),200);}
  window.addEventListener('message',evt=>{
    if(!frameStarted||evt.source!==frame.contentWindow||evt.origin!==appOrigin)return;
    if(evt.data?.source==='picalendar' && evt.data?.event==='google-authorize'){
@@ -48,7 +42,6 @@
      if(!response.ok)throw new Error('Startup checker unavailable');
      const status=await response.json();
      // Reserve the final 5% for the actual touchscreen UI to render, rather than using a timer.
-     update(Math.min(95,(Number(status.completed)||0)*95/(Number(status.total)||7)));
      if(status.done && !frameStarted){
        frameStarted=true;
        appOrigin='http://127.0.0.1:'+Number(status.app_port||8080);
