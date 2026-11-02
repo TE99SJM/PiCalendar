@@ -25,7 +25,13 @@ for i in $(seq 1 50); do
   if ! kill -0 "$STARTUP_PID" 2>/dev/null; then echo 'Startup helper exited unexpectedly' >&2; exit 1; fi
   sleep .1
 done
-"$BROWSER_BIN" --ozone-platform=wayland --kiosk --no-first-run --password-store=basic --disable-translate \
+# Enabled only by the native-keyboard supervisor. Normal launch is unchanged.
+IME_FLAGS=()
+if [[ "${PICALENDAR_NATIVE_KEYBOARD:-0}" == "1" ]]; then
+  unset WAYLAND_DEBUG WVKBD_DEBUG
+  IME_FLAGS=(--enable-wayland-ime --wayland-text-input-version=3)
+fi
+"$BROWSER_BIN" "${IME_FLAGS[@]}" --ozone-platform=wayland --kiosk --no-first-run --password-store=basic --disable-translate \
   --disable-session-crashed-bubble --noerrdialogs --disable-infobars \
   --disable-pinch --hide-scrollbars --no-default-browser-check \
   --start-fullscreen "http://127.0.0.1:${PRELAUNCH_PORT}/"
