@@ -54,6 +54,28 @@ if ! sudo systemctl is-active --quiet family-calendar.service; then
   sudo journalctl -u family-calendar.service -n 50 --no-pager >&2 || true
   exit 1
 fi
+# The photo-only LAN service runs separately from the loopback calendar API.
+cat > /tmp/picalendar-phone.service <<EOF
+[Unit]
+Description=PiCalendar iPhone Photo Drop
+After=network.target family-calendar.service
+
+[Service]
+Type=simple
+User=${USER_NAME}
+WorkingDirectory=${APP_DIR}
+ExecStart=/usr/bin/bash ${APP_DIR}/run-phone.sh
+Restart=on-failure
+RestartSec=3
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo install -m 644 /tmp/picalendar-phone.service /etc/systemd/system/picalendar-phone.service
+rm -f /tmp/picalendar-phone.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now picalendar-phone.service
 printf '\nInstalled! Open http://127.0.0.1:8080 in the Pi browser.\n'
 printf 'To start the display automatically in full-screen, run: ./install-kiosk.sh\n'
 printf 'To connect Google, follow the instructions in README.md.\n'
