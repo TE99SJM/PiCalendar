@@ -99,3 +99,8 @@ body.screen-sleeping #app,body.screen-sleeping #toast{visibility:hidden}
   z-index: 1;
   pointer-events: none;
 }
+
+/* v0.4.2: dedicated touchscreen kiosk, no visible pointer */
+html, body, body *, button, a, input, textarea, select, [role="button"] {
+  cursor: none !important;
+}
