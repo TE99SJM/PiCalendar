@@ -112,3 +112,5 @@ html, body, body *, button, a, input, textarea, select, [role="button"] {
 .google-connection-help{margin-top:10px}
 .google-error{color:#ffadad}
 .google-account{font-weight:600;overflow-wrap:anywhere}
+
+.drive-browser{display:flex;flex-direction:column;gap:10px;max-width:100%;padding:12px;border:1px solid var(--line);border-radius:12px}.drive-toolbar{display:flex;gap:8px;align-items:center}.drive-items{max-height:250px;overflow-y:auto;display:flex;flex-direction:column;gap:6px}.drive-item{background:var(--panel2);padding:8px;border-radius:8px;overflow-wrap:anywhere}.drive-item label{display:flex!important;flex-direction:row!important;align-items:center;gap:8px;cursor:pointer}.drive-item input{width:22px;height:22px;flex:none}.drive-item button{width:100%;text-align:left}
