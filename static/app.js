@@ -468,7 +468,18 @@ function setupDrive(){
 
 async function start(){
   setupDrive();
+  $('phone-start').addEventListener('click',()=>run(async()=>{
+    const session=await api('/api/phone/start',{method:'POST'});
+    $('phone-qr').src='/api/phone/qr?ts='+Date.now();
+    $('phone-panel').classList.remove('hidden');toast('Scan the QR code on your iPhone.');
+  }));
+  $('phone-stop').addEventListener('click',()=>run(async()=>{
+    await api('/api/phone/stop',{method:'POST'});
+    $('phone-panel').classList.add('hidden');state.photos=await api('/api/photos');
+    renderPhotos();renderPhotoSettings();
+  }));
   eventListeners();initializeSleep();updateClock();setInterval(()=>{if(!asleep)updateClock();},15000);
+  setInterval(async()=>{try{if(!$('phone-panel').classList.contains('hidden')){state.photos=await api('/api/photos');renderPhotos();renderPhotoSettings();}}catch(error){console.warn(error);}},5000);
   setInterval(()=>{if(!asleep&&state.photos.length){state.photoIndex=(state.photoIndex+1)%state.photos.length;renderPhotos();}},12000);
   setInterval(()=>{if(!asleep&&!document.querySelector('dialog[open]'))run(getEverything);},60000);
   setInterval(()=>{if(!asleep)renderWeather();},900000);
