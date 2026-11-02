@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#0d1727">
   <title>PiCalendar</title>
   <link rel="icon" type="image/png" href="/static/logo.png">
-  <link rel="stylesheet" href="/static/style.css?v=0.5.0">
-  <script defer src="/static/app.js?v=0.5.0"></script>
+  <link rel="stylesheet" href="/static/style.css?v=0.5.2">
+  <script defer src="/static/app.js?v=0.5.2"></script>
   <link rel="stylesheet" href="/static/touch-gestures.css?v=1.2.1">
   <script defer src="/static/touch-gestures.js?v=1.2.1"></script>
 </head>
@@ -94,6 +94,15 @@
     <div class="form-two"><label>Latitude<input id="weather-latitude" placeholder="45.56" type="number" step="any" min="-90" max="90"></label><label>Longitude<input id="weather-longitude" placeholder="-94.16" type="number" step="any" min="-180" max="180"></label></div>
     <p class="hint">Weather uses Open-Meteo without an API key. Leave coordinates blank to hide.</p>
     <h3>Family photos</h3>
+    <button type="button" class="btn btn-secondary" id="drive-connect">Connect Google Drive</button>
+    <button type="button" class="btn btn-secondary hidden" id="drive-disconnect">Disconnect Drive</button>
+    <div id="drive-browser" class="drive-browser hidden">
+      <div class="drive-toolbar"><button type="button" class="btn btn-secondary" id="drive-up">Back</button><strong id="drive-folder-name">My Drive</strong></div>
+      <div id="drive-items" class="drive-items"></div>
+      <button type="button" class="btn btn-secondary hidden" id="drive-more">Load more</button>
+      <button type="button" class="btn btn-primary" id="drive-import">Import selected photos</button>
+      <p id="drive-message" class="hint">Select up to 20 photos. Copies stay on this Pi.</p>
+    </div>
     <label class="upload-zone">＋ Upload photos<input id="photo-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden></label>
     <div id="photo-settings" class="photo-settings"></div>
     <div class="dialog-actions"><div class="spacer"></div><button type="button" data-close="settings-dialog" class="btn btn-secondary">Close</button><button type="submit" class="btn btn-primary">Save settings</button></div>
