@@ -166,7 +166,7 @@ def index():
 @app.get('/api/status')
 def status():
     settings = get_settings()
-    return {'version': '0.5.0', 'google_connected': connected(), 'google_client_configured': oauth.client_configured(), 'google_online': can_reach_google(),
+    return {'version': '0.5.1', 'google_connected': connected(), 'google_client_configured': oauth.client_configured(), 'google_online': can_reach_google(),
             'local_storage': True,
             'last_sync': settings.get('last_sync', ''), 'last_error': settings.get('last_error', '')}
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PiCalendar v0.4.2: replace tty1 auto-login with a quiet systemd Cage session.
+# PiCalendar v0.5.1: quiet Cage systemd kiosk + post-startup cursor guard.
 # Run over SSH as the normal Pi account. Reboot only after installer finishes.
 set -euo pipefail
 [[ "$EUID" -ne 0 ]] || { echo "Run as your regular user (not sudo)." >&2; exit 1; }
@@ -125,5 +125,33 @@ sudo systemctl disable getty@tty1.service || true
 sudo systemctl set-default multi-user.target
 sudo systemctl enable picalendar-kiosk.service
 
-echo "PiCalendar v0.4.2 quiet kiosk configured. Reboot when ready."
+# v0.5.1: a separate one-shot service waits until the splash is finished,
+# briefly releases/reacquires Cage's DRM cursor plane, then verifies it.
+# Keeping it separate means it cannot stop the calendar server if it fails.
+GUARD_TMP="$(mktemp)"
+trap 'rm -f "$PAM_TMP" "$UNIT_TMP" "$GUARD_TMP"' EXIT
+cat > "$GUARD_TMP" <<GUARD_UNIT
+[Unit]
+Description=PiCalendar touchscreen cursor-plane guard
+After=picalendar-kiosk.service
+PartOf=picalendar-kiosk.service
+ConditionPathExists=/dev/tty1
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/bin/python3 $APP/startup/cursor_guard.py
+TimeoutStartSec=540
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=picalendar-kiosk.service
+GUARD_UNIT
+sudo install -m 644 "$GUARD_TMP" /etc/systemd/system/picalendar-cursor-guard.service
+chmod u+x "$APP/startup/cursor_guard.py"
+sudo systemctl daemon-reload
+sudo systemctl enable picalendar-cursor-guard.service
+
+echo "PiCalendar v0.5.1 quiet kiosk and cursor guard configured. Reboot when ready."
 echo "SSH remains enabled. Rollback: bash $APP/startup/rollback-kiosk-service.sh"

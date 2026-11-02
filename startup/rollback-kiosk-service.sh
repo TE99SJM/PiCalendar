@@ -3,6 +3,8 @@ set -euo pipefail
 [[ "$EUID" -ne 0 ]] || { echo "Run as regular user." >&2; exit 1; }
 BACKUP="$HOME/.config/picalendar-kiosk-v042"
 [[ -d "$BACKUP" ]] || { echo "Missing v0.4.2 backup." >&2; exit 1; }
+sudo systemctl disable --now picalendar-cursor-guard.service || true
+sudo rm -f /etc/systemd/system/picalendar-cursor-guard.service
 sudo systemctl disable --now picalendar-kiosk.service || true
 for name in .bash_profile .bash_login .profile; do
   [[ -f "$BACKUP/$name.before" ]] && cp -p "$BACKUP/$name.before" "$HOME/$name"

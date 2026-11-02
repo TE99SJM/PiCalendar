@@ -22,5 +22,5 @@ def test_local_server_status_and_home():
     with TestClient(app) as client:
         response = client.get('/api/status')
         assert response.status_code == 200
-        assert response.json()['version'] == '0.5.0'
+        assert response.json()['version'] == '0.5.1'
         assert client.get('/').status_code == 200

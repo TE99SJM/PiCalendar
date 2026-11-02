@@ -28,7 +28,7 @@ def test_publisher_configuration_is_not_exposed(monkeypatch):
     with TestClient(app) as client:
         status = client.get('/api/status')
         assert status.status_code == 200
-        assert status.json()['version'] == '0.5.0'
+        assert status.json()['version'] == '0.5.1'
         assert status.json()['google_client_configured']
         assert 'do-not-expose' not in status.text
 
