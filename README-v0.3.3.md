@@ -68,3 +68,33 @@ use `sudo journalctl -u family-calendar.service -n 60 --no-pager` for diagnosis.
 The OAuth callback returns to PiCalendar, which now performs one initial sync
 rather than racing with a second background sync. Sync errors are displayed
 instead of incorrectly claiming success.
+
+## Local touchscreen Google sign-in — no hosted service
+
+Google authorization occurs in the normal Chromium browser on the Raspberry Pi.
+The Google Desktop OAuth loopback callback uses \`127.0.0.1\`; no relay, public
+HTTPS endpoint, cloud host, or QR-code sign-in server is needed.
+
+The **device developer** must still register a Google OAuth Desktop client and
+enable the Calendar API once. Download the client JSON from Google Cloud and
+transfer it privately to the Pi. Then, from the Pi app directory, run:
+
+\`\`\`bash
+bash tools/configure-google-client.sh /path/to/downloaded-desktop-oauth.json
+\`\`\`
+
+The helper validates the JSON, stores it in the gitignored config directory
+with mode 0600, and restarts the calendar service. After that a device user
+simply taps **Settings → Google Calendar → Sign in with Google**; PiCalendar
+returns from Google's secure page and downloads the selected calendars.
+No one using the finished device needs to manage Google tokens.
+
+**Touch keyboard limitation:** The existing Cage compositor has no
+\`zwlr_layer_shell_v1\` support, so standard \`wvkbd\` cannot overlay the
+Chromium sign-in screen. We have deliberately left the known-good Cage
+startup/slide animation unchanged. A USB keyboard works as a fallback for
+Google's login fields. Truly keyboard-free login requires a separately tested
+touch-compatible kiosk compositor and on-screen keyboard.
+
+When developer OAuth setup is missing, the Sign in with Google button now
+shows an explanatory message rather than silently doing nothing.

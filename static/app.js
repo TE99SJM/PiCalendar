@@ -199,9 +199,9 @@ function renderSettings(){
     ${account&&st.google_connected?`<p class="google-account">${esc(account)}</p>`:''}
     <p>${st.google_connected?'Events sync both ways with Google Calendar when online.':'Connect your Google account to display and edit events. Local calendars work offline.'}</p>
     ${st.last_error?`<p class="google-error">${esc(st.last_error)}</p>`:''}
-    ${!ready?'<p class="google-connection-help">Google Sign-In has not been enabled by the PiCalendar publisher. Local calendars still work.</p>':''}
+    ${!ready?'<p class="google-connection-help" role="status">Google sign-in needs a one-time application setup by the device owner. No setup is required from other users. Local calendars still work.</p>':''}
     <div class="google-login-actions">
-      <button type="button" class="btn btn-primary" id="settings-google-login" ${!ready?'disabled title="Google sign-in not provisioned"':''}>${st.google_connected?'Reconnect Google account':'Sign in with Google'}</button>
+      <button type="button" class="btn btn-primary" id="settings-google-login" >${st.google_connected?'Reconnect Google account':'Sign in with Google'}</button>
       ${st.google_connected?'<button type="button" class="btn btn-secondary" id="settings-sync">Sync now</button><button type="button" class="btn btn-secondary" id="settings-google-disconnect">Sign out</button>':''}
     </div>`;
   $('calendar-settings').innerHTML=state.calendars.map(c=>`<label class="cal-setting"><input type="checkbox" data-calendar="${esc(c.id)}" ${c.selected?'checked':''} ${c.id==='local'?'disabled':''}><span class="cal-dot" style="background:${validColor(c.color)}"></span>${esc(c.name)}${c.editable?'':' (read only)'}</label>`).join('');
@@ -365,6 +365,13 @@ function eventListeners(){
   $('settings-dialog').addEventListener('click',e=>{
     if(e.target.id==='settings-sync')run(async()=>{await sync();renderSettings();});
     if(e.target.id==='settings-google-login')run(async()=>{
+      // Explain publisher setup instead of leaving the button seemingly unresponsive.
+      state.status=await api('/api/status');
+      if(!state.status.google_client_configured){
+        renderSettings();
+        toast('Google Sign-In requires one-time setup by the device owner.');
+        return;
+      }
       const result=await api('/api/google/start',{method:'POST'});
       // OAuth must use the top-level browser, not a Google login embedded in an iframe.
       if(window.parent!==window){
