@@ -205,8 +205,8 @@ async def google_authorize_callback(request: Request, state: str = '', error: st
             raise ValueError('Google OAuth redirect must use local loopback.')
         await asyncio.to_thread(oauth.complete_authorization, state, str(request.url))
         set_settings({'last_error': ''})
-        # Do not delay redirect on a potentially slow calendar sync.
-        asyncio.create_task(asyncio.to_thread(sync_google))
+        # The browser performs the first Google sync after redirect.
+        # Avoid overlapping sync jobs so the first calendar refresh is complete.
     except Exception as exc:
         set_settings({'last_error': f'Google login: {type(exc).__name__}: {str(exc)[:180]}'})
         return RedirectResponse('/?google=error', status_code=303)

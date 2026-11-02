@@ -57,3 +57,14 @@ python -m compileall -q family_calendar
 
 Live Google authentication must be tested with the developer's real OAuth client
 on the physical Raspberry Pi; these tests mock Google and require no tokens.
+
+## Startup reliability update
+The initial GitHub upload stored `run.sh` without the executable bit.
+The systemd service now launches it explicitly through Bash and the installer
+repairs launcher permissions. The previous `curl: (7) Connection refused`
+can result when systemd cannot execute `run.sh`. If that symptom persists,
+use `sudo journalctl -u family-calendar.service -n 60 --no-pager` for diagnosis.
+
+The OAuth callback returns to PiCalendar, which now performs one initial sync
+rather than racing with a second background sync. Sync errors are displayed
+instead of incorrectly claiming success.

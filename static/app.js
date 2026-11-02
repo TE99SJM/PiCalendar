@@ -408,7 +408,9 @@ async function sync(){
   $('sync-button').disabled=true;
   try{
     const result=await api('/api/sync',{method:'POST'});
-    toast(result.message||'Calendar synced.');await getEverything();
+    if(result.error)throw new Error(result.error);
+    await getEverything();
+    toast(result.message||'Calendar synced.');
   }catch(err){toast('Sync: '+err.message);state.status=await api('/api/status');renderStatus();}
   finally{$('sync-button').disabled=false;}
 }

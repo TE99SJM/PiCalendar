@@ -20,6 +20,9 @@ chmod 700 data
 if [[ ! -f .env ]]; then
   cp .env.example .env
 fi
+# A checkout can contain shell scripts without executable permissions.
+# Repair launcher permissions before configuring the service.
+chmod +x run.sh run-kiosk.sh startup/launch-console-kiosk.sh
 APP_DIR="$(pwd)"
 USER_NAME="$(id -un)"
 cat > /tmp/family-calendar.service <<EOF
@@ -31,7 +34,7 @@ After=network.target
 Type=simple
 User=${USER_NAME}
 WorkingDirectory=${APP_DIR}
-ExecStart=${APP_DIR}/run.sh
+ExecStart=/usr/bin/bash ${APP_DIR}/run.sh
 Restart=on-failure
 RestartSec=3
 Environment=PYTHONUNBUFFERED=1
@@ -42,7 +45,14 @@ EOF
 sudo install -m 644 /tmp/family-calendar.service /etc/systemd/system/family-calendar.service
 rm -f /tmp/family-calendar.service
 sudo systemctl daemon-reload
-sudo systemctl enable --now family-calendar.service
+sudo systemctl enable family-calendar.service
+sudo systemctl restart family-calendar.service
+# If startup fails, show the real reason instead of claiming installation worked.
+if ! sudo systemctl is-active --quiet family-calendar.service; then
+  echo 'PiCalendar failed to start. Service diagnostics:' >&2
+  sudo journalctl -u family-calendar.service -n 50 --no-pager >&2 || true
+  exit 1
+fi
 printf '\nInstalled! Open http://127.0.0.1:8080 in the Pi browser.\n'
 printf 'To start the display automatically in full-screen, run: ./install-kiosk.sh\n'
 printf 'To connect Google, follow the instructions in README.md.\n'
