@@ -23,7 +23,7 @@ from pydantic import BaseModel, Field, field_validator
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 from .google_sync import connected, sync_google, disconnect_google
-from . import oauth, drive_photos
+from . import oauth, drive_photos, phone_transfer
 from .photo_files import save_photo, MAX_PHOTO_BYTES
 from .display import backlight
 from .storage import (
@@ -167,7 +167,7 @@ def index():
 @app.get('/api/status')
 def status():
     settings = get_settings()
-    return {'version': '0.5.2', 'drive_connected': drive_photos.connected(), 'google_connected': connected(), 'google_client_configured': oauth.client_configured(), 'google_online': can_reach_google(),
+    return {'version': '0.5.3', 'drive_connected': drive_photos.connected(), 'google_connected': connected(), 'google_client_configured': oauth.client_configured(), 'google_online': can_reach_google(),
             'local_storage': True,
             'last_sync': settings.get('last_sync', ''), 'last_error': settings.get('last_error', '')}
 
@@ -258,6 +258,33 @@ async def import_drive(payload: DriveImportInput):
         return await asyncio.to_thread(drive_photos.import_files, payload.file_ids)
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
+
+
+@app.post('/api/phone/start')
+def phone_start(request: Request):
+    expected = f"http://127.0.0.1:{os.environ.get('FAMILY_CALENDAR_PORT','8080')}"
+    if request.headers.get('origin') not in (None, expected):
+        raise HTTPException(403,'Use the PiCalendar touchscreen.')
+    try:
+        return phone_transfer.begin_session()
+    except ValueError as exc:
+        raise HTTPException(422,str(exc)) from exc
+
+@app.get('/api/phone/qr')
+def phone_qr():
+    try:
+        from fastapi.responses import Response
+        return Response(phone_transfer.qr_png(), media_type='image/png', headers={'Cache-Control':'no-store'})
+    except ValueError as exc:
+        raise HTTPException(404,str(exc)) from exc
+
+@app.post('/api/phone/stop')
+def phone_stop(request: Request):
+    expected = f"http://127.0.0.1:{os.environ.get('FAMILY_CALENDAR_PORT','8080')}"
+    if request.headers.get('origin') not in (None, expected):
+        raise HTTPException(403,'Use the PiCalendar touchscreen.')
+    phone_transfer.end_session()
+    return {'stopped':True}
 
 @app.get('/api/display/status')
 def display_status():
