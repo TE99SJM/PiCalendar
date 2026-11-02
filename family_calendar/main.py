@@ -23,7 +23,8 @@ from pydantic import BaseModel, Field, field_validator
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 from .google_sync import connected, sync_google, disconnect_google
-from . import oauth
+from . import oauth, drive_photos
+from .photo_files import save_photo, MAX_PHOTO_BYTES
 from .display import backlight
 from .storage import (
     PHOTOS_DIR, PROJECT_ROOT, db, event_list, get_calendars, get_settings,
@@ -166,7 +167,7 @@ def index():
 @app.get('/api/status')
 def status():
     settings = get_settings()
-    return {'version': '0.5.0', 'google_connected': connected(), 'google_client_configured': oauth.client_configured(), 'google_online': can_reach_google(),
+    return {'version': '0.5.2', 'drive_connected': drive_photos.connected(), 'google_connected': connected(), 'google_client_configured': oauth.client_configured(), 'google_online': can_reach_google(),
             'local_storage': True,
             'last_sync': settings.get('last_sync', ''), 'last_error': settings.get('last_error', '')}
 
@@ -211,6 +212,52 @@ async def google_authorize_callback(request: Request, state: str = '', error: st
         set_settings({'last_error': f'Google login: {type(exc).__name__}: {str(exc)[:180]}'})
         return RedirectResponse('/?google=error', status_code=303)
     return RedirectResponse('/?google=connected', status_code=303)
+
+
+@app.post('/api/drive/start')
+def start_drive():
+    try:
+        return {'authorization_url': drive_photos.begin_authorization(int(os.environ.get('FAMILY_CALENDAR_PORT', '8080')))}
+    except (ValueError, OSError) as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+@app.get('/api/drive/callback')
+async def drive_callback(request: Request, state: str = '', error: str = ''):
+    if error:
+        return RedirectResponse('/?drive=error', status_code=303)
+    try:
+        if request.url.hostname != '127.0.0.1':
+            raise ValueError('Drive OAuth callback must use loopback.')
+        await asyncio.to_thread(drive_photos.finish_authorization, state, str(request.url))
+        return RedirectResponse('/?drive=connected', status_code=303)
+    except Exception:
+        return RedirectResponse('/?drive=error', status_code=303)
+
+@app.post('/api/drive/disconnect')
+def disconnect_drive(request: Request):
+    origin = request.headers.get('origin')
+    expected = f"http://127.0.0.1:{os.environ.get('FAMILY_CALENDAR_PORT', '8080')}"
+    if origin and origin != expected:
+        raise HTTPException(403, 'Use the local PiCalendar screen.')
+    drive_photos.disconnect()
+    return {'connected': False}
+
+@app.get('/api/drive/files')
+async def list_drive(folder: str = 'root', page_token: str = ''):
+    try:
+        return await asyncio.to_thread(drive_photos.list_files, folder, page_token)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+class DriveImportInput(BaseModel):
+    file_ids: list[str] = Field(min_length=1, max_length=20)
+
+@app.post('/api/drive/import')
+async def import_drive(payload: DriveImportInput):
+    try:
+        return await asyncio.to_thread(drive_photos.import_files, payload.file_ids)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
 
 @app.get('/api/display/status')
 def display_status():
@@ -423,22 +470,11 @@ def photo_list():
 
 @app.post('/api/photos', status_code=201)
 async def photo_upload(file: UploadFile = File(...)):
-    raw = await file.read(8 * 1024 * 1024 + 1)
-    if len(raw) > 8 * 1024 * 1024:
-        raise HTTPException(413, 'Photo must be smaller than 8MB')
+    raw = await file.read(MAX_PHOTO_BYTES + 1)
     try:
-        image = Image.open(io.BytesIO(raw))
-        image.verify()
-        image = Image.open(io.BytesIO(raw))
-        image = ImageOps.exif_transpose(image)
-        image.thumbnail((2048, 2048))
-        if image.mode not in ('RGB', 'L'):
-            image = image.convert('RGB')
-        name = uuid.uuid4().hex + '.jpg'
-        image.save(PHOTOS_DIR / name, format='JPEG', quality=85, optimize=True)
-    except (UnidentifiedImageError, OSError, ValueError):
-        raise HTTPException(422, 'Unsupported or damaged image')
-    return {'filename': name, 'url': '/photos/' + name}
+        return save_photo(raw)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
 
 
 @app.delete('/api/photos/{name}')
