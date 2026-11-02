@@ -73,3 +73,58 @@ def test_disconnect_preserves_local_data(monkeypatch, tmp_path):
     assert not (tmp_path/'google-token.json').exists()
     with db() as con:
         assert [r['id'] for r in con.execute('SELECT id FROM events')] == ['local1']
+
+def test_google_callback_uses_authorization_code_not_http_transport(monkeypatch):
+    """Google allows HTTP loopback on Desktop OAuth; token exchange stays HTTPS."""
+    from types import SimpleNamespace
+    import time
+
+    class FakeFlow:
+        credentials = SimpleNamespace(refresh_token='fake-refresh-token')
+
+        def __init__(self):
+            self.calls = []
+
+        def fetch_token(self, **kwargs):
+            self.calls.append(kwargs)
+
+    fake = FakeFlow()
+    saved = []
+    monkeypatch.setattr(oauth, 'save_credentials', lambda credentials: saved.append(credentials))
+
+    with oauth._LOCK:
+        oauth._PENDING.clear()
+        oauth._PENDING.update(flow=fake, state='safe-state', created=time.monotonic(), port=8080)
+    oauth.complete_authorization(
+        'safe-state',
+        'http://127.0.0.1:8080/api/google/callback?state=safe-state&code=abc%2B123'
+    )
+    assert fake.calls == [{'code': 'abc+123'}]
+    assert len(saved) == 1
+
+
+def test_google_callback_rejects_invalid_state_host_or_missing_code(monkeypatch):
+    import time
+    from types import SimpleNamespace
+
+    class FakeFlow:
+        credentials = SimpleNamespace(refresh_token='fake-refresh-token')
+
+        def fetch_token(self, **kwargs):
+            raise AssertionError('Invalid callback must never exchange a token')
+
+    for state, callback in [
+        ('wrong', 'http://127.0.0.1:8080/api/google/callback?state=safe&code=abc'),
+        ('safe', 'http://example.org:8080/api/google/callback?state=safe&code=abc'),
+        ('safe', 'http://127.0.0.1:8080/api/google/callback?state=safe'),
+        ('safe', 'http://127.0.0.1:8080/api/google/callback?state=other&code=abc'),
+    ]:
+        with oauth._LOCK:
+            oauth._PENDING.clear()
+            oauth._PENDING.update(flow=FakeFlow(), state='safe', created=time.monotonic(), port=8080)
+        try:
+            oauth.complete_authorization(state, callback)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError('Invalid OAuth callback was accepted')

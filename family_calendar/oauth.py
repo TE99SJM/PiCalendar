@@ -12,7 +12,7 @@ import secrets
 import threading
 import time
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 from .google_sync import SCOPES, save_credentials
 from .storage import PROJECT_ROOT, SECRETS_FILE
@@ -101,7 +101,18 @@ def complete_authorization(state: str, callback_url: str) -> None:
             raise ValueError('Invalid Google OAuth redirect.')
         _PENDING.clear()
     flow = pending['flow']
-    flow.fetch_token(authorization_response=callback_url)
+    params = parse_qs(target.query, keep_blank_values=True)
+    codes = params.get('code', [])
+    if len(codes) != 1 or not codes[0]:
+        raise ValueError('Google did not return an authorization code. Try again.')
+    callback_states = params.get('state', [])
+    if len(callback_states) != 1 or not secrets.compare_digest(callback_states[0], state):
+        raise ValueError('Invalid Google sign-in state. Retry from Settings.')
+    # Google permits HTTP loopback redirect URIs for Desktop OAuth clients.
+    # OAuthlib rejects such URLs when parsing authorization_response directly.
+    # Pass the verified code; the token exchange still uses Google's HTTPS URL
+    # and retains the OAuth code verifier (PKCE) from the original Flow.
+    flow.fetch_token(code=codes[0])
     if not flow.credentials or not flow.credentials.refresh_token:
         raise ValueError('Google did not provide offline access; reconnect in Settings.')
     save_credentials(flow.credentials)

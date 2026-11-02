@@ -98,3 +98,14 @@ touch-compatible kiosk compositor and on-screen keyboard.
 
 When developer OAuth setup is missing, the Sign in with Google button now
 shows an explanatory message rather than silently doing nothing.
+
+## v0.3.3 Google callback transport fix
+
+Desktop OAuth permits a local `http://127.0.0.1` callback, but OAuthlib may
+raise `InsecureTransportError: OAuth 2 MUST utilize https` when handed the
+entire callback URL. PiCalendar now validates the loopback callback and CSRF
+state itself, extracts the code, then exchanges that code against Google's
+**HTTPS** token endpoint. It does not set `OAUTHLIB_INSECURE_TRANSPORT` and
+does not require a hosted web server, HTTPS on localhost, or new credentials.
+
+Existing calendar data and Google client configuration are unchanged.
