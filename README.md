@@ -1,4 +1,6 @@
-> **Current release: PiCalendar v0.3.1.** For the no-desktop boot, animated swipes, and Google login directly from Settings, follow **README-v0.3.1.md**. This older document describes the original installation and optional terminal-based OAuth flow.
+> **Current integration branch: PiCalendar v0.5.0.** Combines the v0.4.2 quiet startup and cursor suppression with the working v0.3.3 Google Sign-In and HTTPS token-exchange fix. See [README-v0.5.0.md](README-v0.5.0.md).
+
+> **Previous release: PiCalendar v0.3.1.** For the no-desktop boot, animated swipes, and Google login directly from Settings, follow **README-v0.3.1.md**. This older document describes the original installation and optional terminal-based OAuth flow.
 
 # PiCalendar v0.3
 

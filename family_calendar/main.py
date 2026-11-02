@@ -22,7 +22,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 from PIL import Image, ImageOps, UnidentifiedImageError
 
-from .google_sync import connected, sync_google
+from .google_sync import connected, sync_google, disconnect_google
 from . import oauth
 from .display import backlight
 from .storage import (
@@ -166,21 +166,10 @@ def index():
 @app.get('/api/status')
 def status():
     settings = get_settings()
-    return {'version': '0.3.1', 'google_connected': connected(), 'google_client_configured': oauth.client_configured(), 'google_online': can_reach_google(),
+    return {'version': '0.5.0', 'google_connected': connected(), 'google_client_configured': oauth.client_configured(), 'google_online': can_reach_google(),
             'local_storage': True,
             'last_sync': settings.get('last_sync', ''), 'last_error': settings.get('last_error', '')}
 
-
-
-@app.post('/api/google/client')
-async def google_client_upload(file: UploadFile = File(...)):
-    """Google OAuth desktop-client JSON is stored only on the local Pi (0600)."""
-    try:
-        raw = await file.read(32_001)
-        oauth.save_client_file(raw)
-    except ValueError as exc:
-        raise HTTPException(422, str(exc)) from exc
-    return {'configured': True}
 
 
 @app.post('/api/google/start')
@@ -194,6 +183,17 @@ def google_authorize_start():
     return {'authorization_url': url}
 
 
+@app.post('/api/google/disconnect')
+def google_disconnect(request: Request):
+    """Remove tokens and downloaded Google events; retain all local data."""
+    origin = request.headers.get('origin')
+    expected = f"http://127.0.0.1:{os.environ.get('FAMILY_CALENDAR_PORT', '8080')}"
+    if origin and origin != expected:
+        raise HTTPException(403, 'Use the local PiCalendar interface.')
+    disconnect_google()
+    return {'connected': False}
+
+
 @app.get('/api/google/callback')
 async def google_authorize_callback(request: Request, state: str = '', error: str = ''):
     if error:
@@ -201,10 +201,12 @@ async def google_authorize_callback(request: Request, state: str = '', error: st
         return RedirectResponse('/?google=error', status_code=303)
     try:
         # Credential exchange makes an outbound HTTPS request to Google.
+        if request.url.hostname != '127.0.0.1':
+            raise ValueError('Google OAuth redirect must use local loopback.')
         await asyncio.to_thread(oauth.complete_authorization, state, str(request.url))
         set_settings({'last_error': ''})
-        # Do not delay redirect on a potentially slow calendar sync.
-        asyncio.create_task(asyncio.to_thread(sync_google))
+        # The browser performs the first Google sync after redirect.
+        # Avoid overlapping sync jobs so the first calendar refresh is complete.
     except Exception as exc:
         set_settings({'last_error': f'Google login: {type(exc).__name__}: {str(exc)[:180]}'})
         return RedirectResponse('/?google=error', status_code=303)
