@@ -6,7 +6,7 @@ set -euo pipefail
 APP="$(cd "$(dirname "$0")/.." && pwd)"
 [[ "$APP" == "$HOME/family-calendar-pi" ]] || { echo "Expected $HOME/family-calendar-pi, got $APP" >&2; exit 1; }
 [[ -f "$APP/static/index.html" && -f "$APP/startup/splash.html" ]] || { echo "PiCalendar files missing." >&2; exit 1; }
-for cmd in cage chvt python3 systemctl; do command -v "$cmd" >/dev/null || { echo "Missing $cmd" >&2; exit 1; }; done
+for cmd in cage chvt python3 systemctl udevadm; do command -v "$cmd" >/dev/null || { echo "Missing $cmd" >&2; exit 1; }; done
 [[ -c /dev/tty1 ]] || { echo "/dev/tty1 missing." >&2; exit 1; }
 sudo systemctl is-active --quiet family-calendar || { echo "Start family-calendar first." >&2; exit 1; }
 
@@ -15,7 +15,7 @@ mkdir -p "$BACKUP"
 chmod 700 "$BACKUP"
 [[ -f "$BACKUP/default-target.before" ]] || systemctl get-default > "$BACKUP/default-target.before"
 [[ -f "$BACKUP/getty-enabled.before" ]] || { systemctl is-enabled getty@tty1.service > "$BACKUP/getty-enabled.before" 2>/dev/null || true; }
-for target in /etc/pam.d/picalendar /etc/systemd/system/picalendar-kiosk.service; do
+for target in /etc/pam.d/picalendar /etc/systemd/system/picalendar-kiosk.service /etc/udev/rules.d/99-picalendar-cursor.rules; do
   old="$BACKUP/$(basename "$target").before"
   if [[ -f "$target" && ! -f "$old" ]]; then sudo cp -p "$target" "$old"; fi
 done
@@ -113,6 +113,12 @@ sudo install -m 644 "$PAM_TMP" /etc/pam.d/picalendar
 sudo install -m 644 "$UNIT_TMP" /etc/systemd/system/picalendar-kiosk.service
 chmod u+x "$APP/run.sh" "$APP/run-kiosk.sh"
 sudo systemctl daemon-reload
+
+# Do not present Raspberry Pi HDMI-CEC keyboard interfaces as mouse devices.
+# Keeps the touchscreen and HDMI keyboard events enabled.
+sudo install -m 644 "$APP/startup/99-picalendar-cursor.rules" /etc/udev/rules.d/99-picalendar-cursor.rules
+sudo udevadm control --reload-rules
+sudo udevadm trigger --subsystem-match=input
 
 # The desktop remains untouched; stop the console getty only on the next boot.
 sudo systemctl disable getty@tty1.service || true

@@ -1,0 +1,4 @@
+# PiCalendar v0.4.2: HDMI-CEC keyboard devices are not physical mice.
+# Leave keyboard input and touchscreen devices operational.
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="vc4-hdmi-0", ENV{ID_INPUT_MOUSE}="0", ENV{ID_INPUT_POINTINGSTICK}="0"
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="vc4-hdmi-1", ENV{ID_INPUT_MOUSE}="0", ENV{ID_INPUT_POINTINGSTICK}="0"
