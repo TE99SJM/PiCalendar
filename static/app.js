@@ -206,6 +206,9 @@ function renderSettings(){
     </div>`;
   $('calendar-settings').innerHTML=state.calendars.map(c=>`<label class="cal-setting"><input type="checkbox" data-calendar="${esc(c.id)}" ${c.selected?'checked':''} ${c.id==='local'?'disabled':''}><span class="cal-dot" style="background:${validColor(c.color)}"></span>${esc(c.name)}${c.editable?'':' (read only)'}</label>`).join('');
   renderPhotoSettings();
+  $('drive-connect').textContent=st.drive_connected?'Browse Google Drive':'Connect Google Drive';
+  $('drive-disconnect').classList.toggle('hidden',!st.drive_connected);
+  $('drive-browser').classList.toggle('hidden',!st.drive_connected);
 }
 function renderPhotoSettings(){
   $('photo-settings').innerHTML=state.photos.map(p=>`<div class="photo-preview"><img src="${esc(p.url)}" alt="Photo"><button type="button" data-photo-delete="${esc(p.filename)}" title="Remove photo">×</button></div>`).join('');
@@ -421,13 +424,59 @@ async function sync(){
   }catch(err){toast('Sync: '+err.message);state.status=await api('/api/status');renderStatus();}
   finally{$('sync-button').disabled=false;}
 }
+
+let driveFolders=[{id:'root',name:'My Drive'}],drivePage='',driveSelected=new Set();
+async function driveBrowse(folder='root',append=false){
+ const result=await api('/api/drive/files?folder='+encodeURIComponent(folder)+(append&&drivePage?'&page_token='+encodeURIComponent(drivePage):''));
+ drivePage=result.next_page_token||'';
+ if(!append){driveSelected.clear();$('drive-items').replaceChildren();}
+ $('drive-folder-name').textContent=driveFolders[driveFolders.length-1].name;
+ for(const item of result.files){
+  const div=document.createElement('div');div.className='drive-item';
+  if(item.mimeType==='application/vnd.google-apps.folder'){
+   const b=document.createElement('button');b.className='btn btn-secondary';b.type='button';b.textContent='📁 '+item.name;
+   b.addEventListener('click',()=>run(async()=>{driveFolders.push({id:item.id,name:item.name});await driveBrowse(item.id);}));div.append(b);
+  }else{
+   const label=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.value=item.id;
+   c.addEventListener('change',()=>{if(c.checked){if(driveSelected.size>=20){c.checked=false;toast('Maximum 20 photos.');return;}driveSelected.add(item.id);}else driveSelected.delete(item.id);});
+   label.append(c,document.createTextNode(' 🖼 '+item.name));div.append(label);
+  }$('drive-items').append(div);
+ }
+ $('drive-more').classList.toggle('hidden',!drivePage);
+}
+function setupDrive(){
+ $('drive-connect').addEventListener('click',()=>run(async()=>{
+  if(state.status.drive_connected){driveFolders=[{id:'root',name:'My Drive'}];await driveBrowse();return;}
+  const result=await api('/api/drive/start',{method:'POST'});
+  if(window.parent!==window)window.parent.postMessage({source:'picalendar',event:'google-authorize',url:result.authorization_url},'http://127.0.0.1:8081');
+  else window.location.assign(result.authorization_url);
+ }));
+ $('drive-disconnect').addEventListener('click',()=>run(async()=>{await api('/api/drive/disconnect',{method:'POST'});state.status=await api('/api/status');renderSettings();toast('Drive disconnected; photos remain.');}));
+ $('drive-up').addEventListener('click',()=>run(async()=>{if(driveFolders.length>1)driveFolders.pop();await driveBrowse(driveFolders[driveFolders.length-1].id);}));
+ $('drive-more').addEventListener('click',()=>run(()=>driveBrowse(driveFolders[driveFolders.length-1].id,true)));
+ $('drive-import').addEventListener('click',()=>run(async()=>{
+  if(!driveSelected.size){toast('Choose photos first.');return;}
+  const btn=$('drive-import');btn.disabled=true;btn.textContent='Importing…';
+  try{
+   const result=await api('/api/drive/import',{method:'POST',body:JSON.stringify({file_ids:[...driveSelected]})});
+   $('drive-message').textContent=result.imported.length+' imported; '+result.errors.length+' failed.';
+   state.photos=await api('/api/photos');renderPhotos();renderPhotoSettings();toast(result.imported.length+' photos imported.');
+   if(!result.errors.length)await driveBrowse(driveFolders[driveFolders.length-1].id);
+  }finally{btn.disabled=false;btn.textContent='Import selected photos';}
+ }));
+}
+
 async function start(){
+  setupDrive();
   eventListeners();initializeSleep();updateClock();setInterval(()=>{if(!asleep)updateClock();},15000);
   setInterval(()=>{if(!asleep&&state.photos.length){state.photoIndex=(state.photoIndex+1)%state.photos.length;renderPhotos();}},12000);
   setInterval(()=>{if(!asleep&&!document.querySelector('dialog[open]'))run(getEverything);},60000);
   setInterval(()=>{if(!asleep)renderWeather();},900000);
   try{
     await getEverything();
+    const driveOutcome=new URLSearchParams(location.search).get('drive');
+    if(driveOutcome==='connected'){toast('Drive connected.');state.status=await api('/api/status');renderSettings();}
+    if(driveOutcome==='error')toast('Drive connection failed. Retry in Settings.');
     const outcome=new URLSearchParams(location.search).get('google');
     if(outcome==='connected'){
       toast('Google account connected. Syncing calendars…');
