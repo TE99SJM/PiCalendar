@@ -13,6 +13,7 @@
 #sleep-button{font-family:system-ui,sans-serif;font-size:27px}
 #sleep-overlay{display:none;position:fixed;inset:0;background:#000;z-index:9999;cursor:default;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 #sleep-overlay.sleeping{display:block}
+#sleep-overlay:focus{outline:none}
 body.screen-sleeping #app,body.screen-sleeping #toast{visibility:hidden}
 
 /* 0.3.1 animated month/week transition: viewport prevents panels sliding over sidebar */

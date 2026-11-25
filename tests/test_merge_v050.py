@@ -24,5 +24,5 @@ def test_launcher_and_asset_version():
     html=(ROOT/'static/index.html').read_text()
     assert 'ExecStart=/usr/bin/bash ${APP_DIR}/run.sh' in installer
     assert 'sudo systemctl restart family-calendar.service' in installer
-    assert '/static/style.css?v=0.5.0' in html
+    assert '/static/style.css?v=0.5.6' in html
     assert '/static/app.js?v=0.5.6' in html
