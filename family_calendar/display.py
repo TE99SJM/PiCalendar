@@ -29,7 +29,7 @@ class BacklightController:
 
     def ddcutil_display(self) -> int | None:
         """Return the explicitly selected ddcutil display number, if valid."""
-        value = os.environ.get('FAMILY_CALENDAR_DDCUTIL_DISPLAY', '').strip()
+        value = os.environ.get('FAMILY_CALENDAR_DDCUTIL_DISPLAY', '1').strip()
         if not value:
             return None
         if not value.isdigit() or int(value) < 1:
