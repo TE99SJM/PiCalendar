@@ -64,9 +64,9 @@ class BacklightController:
                 if asleep:
                     if current > 0:
                         self.previous_brightness = min(current, maximum)
-                    brightness.write_text('0\\n')
+                    brightness.write_text('0\n')
                 else:
-                    brightness.write_text(f'{self.previous_brightness or maximum}\\n')
+                    brightness.write_text(f'{self.previous_brightness or maximum}\n')
                 return {'mode': 'hardware', 'changed': True}
             except (OSError, ValueError) as exc:
                 # Do not break touch wake when a particular panel lacks sysfs control.
