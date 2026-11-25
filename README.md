@@ -62,7 +62,7 @@ If `unzip` isn't installed: `sudo apt-get install unzip`. Don't run `unzip` in W
 
 - PiCalendar API binds to `127.0.0.1:8080` on the Pi (private kiosk).
 - Google syncing requires configuring Google Cloud OAuth on the Pi; it is not automatically authorized by installing the release.
-- Sleep-to-black uses a black overlay by default. Optional sysfs backlight control and DDC/CI standby are available for compatible displays; either hardware mode requires touch to remain available while the panel is dark.
+- Sleep-to-black uses a black overlay and attempts DDC/CI standby on monitor 1 by default when `ddcutil` is installed. Hardware sleep requires touch to remain available while the panel is dark.
 
 ---
 
@@ -79,7 +79,7 @@ If `unzip` isn't installed: `sudo apt-get install unzip`. Don't run `unzip` in W
 | Photo slideshow | Upload/remove photos from the touchscreen; rotates every 12 seconds |
 | Weather (optional) | Local weather from Open-Meteo, using your latitude/longitude |
 | Full-screen kiosk | Starts Chromium on boot after your Raspberry Pi OS desktop login |
-| Display sleep and wake | Tap ⏻ to black out the display; double tap to wake. Optional backlight or DDC/CI standby for compatible screens |
+| Display sleep and wake | Tap ⏻ to black out the display; double tap to wake. DDC/CI standby is attempted by default when `ddcutil` is installed; compatible screens can turn off the backlight. |
 | Data storage | Local SQLite database and local JPEG photos on the Pi |
 
 **Important scope:** Google sync applies to **calendar events**. Chores, groceries, meals, and photos are local-only in this version. You must configure your own Google Cloud OAuth desktop client for Google sync; it is free for ordinary personal calendar API use, subject to Google's terms and quotas. The local calendar works without any Google connection.
@@ -122,8 +122,7 @@ Escape on an attached keyboard as a fallback.
 
 **This is display sleep, not Raspberry Pi CPU hibernation.** The Pi and the touch
 controller must remain awake to recognize the double tap. The local Google sync
-service can continue working while the screen sleeps. Software blanking is the
-default: the picture is black, but an LCD monitor's backlight **may still be on**.
+service can continue working while the screen sleeps. PiCalendar tries DDC/CI standby on monitor 1 by default when `ddcutil` is installed; compatible monitors turn off the panel/backlight. If DDC/CI is unavailable or unsupported, the app keeps the black overlay, and the backlight may remain on.
 
 ### Optional true backlight-off (screen dependent)
 
@@ -148,24 +147,26 @@ would not work.
    brightness back. The current optional mode is available at
    `http://127.0.0.1:8080/api/display/status` on the Pi.
 
-### Optional HDMI monitor standby with DDC/CI
+### HDMI monitor standby with DDC/CI (default)
 
-For monitors that support the MCCS D6 power-mode feature, PiCalendar can request
-DPMS standby when you tap ⏻ and restore normal operation when you double-tap.
-Standby is used instead of full power-off so the monitor can still receive the
-wake command. This can turn off the panel/backlight while keeping the monitor
-powered, but some monitors also disable their USB touch controller in standby.
-Test your exact monitor before relying on touch-to-wake.
+For monitors that support the MCCS D6 power-mode feature, PiCalendar requests
+DPMS standby when you tap ⏻ and restores normal operation when you double-tap.
+It tries display 1 by default when `ddcutil` is installed. Standby is used instead
+of full power-off so the monitor can still receive the wake command. This can
+turn off the panel/backlight while keeping the monitor powered, but some monitors
+disable their USB touch controller in standby. Test your exact monitor before
+relying on touch-to-wake.
 
 1. Enable **DDC/CI** in the monitor's on-screen menu, if it has that option.
 2. Install ddcutil on the Pi: `sudo apt install ddcutil`.
 3. Run `ddcutil detect` as the same Linux user that runs PiCalendar. Find the
    monitor number. If detection reports a permission error, grant that user
    access to the monitor's I2C device, then sign out and back in.
-4. Set `FAMILY_CALENDAR_DDCUTIL_DISPLAY=1` in
-   `~/family-calendar-pi/.env`, replacing `1` with the number reported for
-   your monitor. Restart the service:
-   `sudo systemctl restart family-calendar`.
+4. PiCalendar uses display 1 by default. If `ddcutil detect` reports a different
+   number, set `FAMILY_CALENDAR_DDCUTIL_DISPLAY=<number>` in
+   `~/family-calendar-pi/.env`, then restart the service:
+   `sudo systemctl restart family-calendar`. Leave the variable unset to use
+   display 1, or set it blank to disable DDC/CI standby.
 5. Check `http://127.0.0.1:8080/api/display/status`; it should report
    `"mode":"ddcutil"`. Tap ⏻, then double-tap the dark screen. If the monitor
    or touch stops responding, remove the setting from `.env` and restart the
