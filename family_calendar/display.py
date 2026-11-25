@@ -41,7 +41,7 @@ class BacklightController:
         if base is not None:
             available = (base / 'brightness').is_file() and (base / 'max_brightness').is_file()
             return {'configured': True, 'available': available,
-                    'mode': 'backlight' if available else 'software'}
+                    'mode': 'hardware' if available else 'software'}
 
         display = self.ddcutil_display()
         if display is not None:
@@ -67,7 +67,7 @@ class BacklightController:
                     brightness.write_text('0\\n')
                 else:
                     brightness.write_text(f'{self.previous_brightness or maximum}\\n')
-                return {'mode': 'backlight', 'changed': True}
+                return {'mode': 'hardware', 'changed': True}
             except (OSError, ValueError) as exc:
                 # Do not break touch wake when a particular panel lacks sysfs control.
                 return {'mode': 'software', 'changed': False, 'error': str(exc)}
