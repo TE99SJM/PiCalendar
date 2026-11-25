@@ -112,3 +112,7 @@ html, body, body *, button, a, input, textarea, select, [role="button"] {
 .google-connection-help{margin-top:10px}
 .google-error{color:#ffadad}
 .google-account{font-weight:600;overflow-wrap:anywhere}
+
+
+/* v0.5.6: keep adjacent-month dates blank while preserving the 6-week grid. */
+.day-cell.empty{background:transparent;border-color:transparent;pointer-events:none}
