@@ -61,9 +61,14 @@ function renderCalendar(){
   const today=dateKey(new Date()), selected=dateKey(state.selected);
   let html='';
   for(let i=0;i<days;i++){
-    const day=addDays(gridStart,i),key=dateKey(day),onDay=sortEvents(state.events.filter(e=>eventOnDay(e,day)));
+    const day=addDays(gridStart,i);
     const notMonth=isMonth && day.getMonth()!==anchor.getMonth();
-    html+=`<div class="day-cell ${notMonth?'other':''} ${key===today?'today':''} ${key===selected?'selected':''}" data-day="${key}" role="button" tabindex="0" aria-label="${esc(dayLabel(day))}">
+    if(notMonth){
+      html+='<div class="day-cell empty" aria-hidden="true"></div>';
+      continue;
+    }
+    const key=dateKey(day),onDay=sortEvents(state.events.filter(e=>eventOnDay(e,day)));
+    html+=`<div class="day-cell ${key===today?'today':''} ${key===selected?'selected':''}" data-day="${key}" role="button" tabindex="0" aria-label="${esc(dayLabel(day))}">
       <div class="day-head"><span class="day-number">${day.getDate()}</span>${onDay.length>0?`<span class="dot">${onDay.length} event${onDay.length!==1?'s':''}</span>`:''}</div>
       <div class="day-events">${onDay.slice(0,isMonth?3:12).map(e=>`<button class="event-pill" data-event="${esc(e.id)}" style="border-left-color:${validColor(e.color)}">${esc(eventText(e))}</button>`).join('')}
       ${onDay.length>(isMonth?3:12)?`<span class="more-events">+${onDay.length-(isMonth?3:12)} more</span>`:''}</div></div>`;
