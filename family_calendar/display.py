@@ -86,7 +86,7 @@ class BacklightController:
         # power-off because the monitor may stop accepting the wake command.
         power_mode = '0x02' if asleep else '0x01'
         command = [
-            ddcutil, 'setvcp', '--display', str(display), '--noverify',
+            ddcutil, 'setvcp', '--display', str(display),
             'D6', power_mode,
         ]
         try:
