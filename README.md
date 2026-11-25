@@ -79,7 +79,7 @@ If `unzip` isn't installed: `sudo apt-get install unzip`. Don't run `unzip` in W
 | Photo slideshow | Upload/remove photos from the touchscreen; rotates every 12 seconds |
 | Weather (optional) | Local weather from Open-Meteo, using your latitude/longitude |
 | Full-screen kiosk | Starts Chromium on boot after your Raspberry Pi OS desktop login |
-| Display sleep and wake | Tap ⏻ to black out the display; double tap to wake. Optional physical backlight-off for compatible screens |
+| Display sleep and wake | The display sleeps after 10 minutes of inactivity. Tap ⏻ to sleep immediately or double tap the screen to wake. Compatible screens can also turn off the backlight. |
 | Data storage | Local SQLite database and local JPEG photos on the Pi |
 
 **Important scope:** Google sync applies to **calendar events**. Chores, groceries, meals, and photos are local-only in this version. You must configure your own Google Cloud OAuth desktop client for Google sync; it is free for ordinary personal calendar API use, subject to Google's terms and quotas. The local calendar works without any Google connection.

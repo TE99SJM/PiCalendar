@@ -250,6 +250,7 @@ function goPrevNext(delta){run(()=>changePeriod(delta));}
 // When configured on the Pi, the optional backlight API also turns off the
 // panel light. A hardware-off monitor that disconnects its touch USB cannot
 // be woken by touch; leave hardware control disabled on those displays.
+const IDLE_SLEEP_MS=10*60*1000;
 const WAKE_WINDOW_MS=650;
 const MAX_TAP_MOVEMENT=40;
 const MAX_TAP_SEPARATION=140;
@@ -258,6 +259,13 @@ let firstTap=null;
 let pressedAt=null;
 let waking=false;
 let sleepRequest=Promise.resolve();
+let idleSleepTimer;
+
+function resetIdleSleepTimer(){
+  if(asleep)return;
+  clearTimeout(idleSleepTimer);
+  idleSleepTimer=setTimeout(()=>void sleepDisplay(),IDLE_SLEEP_MS);
+}
 
 function setSleepOverlay(active){
   asleep=active;
@@ -274,6 +282,7 @@ async function displayPower(action){
 }
 async function sleepDisplay(){
   if(asleep)return;
+  clearTimeout(idleSleepTimer);
   // Close dialogs so focus cannot become trapped behind the sleep screen.
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   setSleepOverlay(true);
@@ -290,6 +299,7 @@ async function wakeDisplay(){
   await displayPower('wake');
   setSleepOverlay(false);
   waking=false;
+  resetIdleSleepTimer();
   updateClock();
   run(getEverything);
   run(renderWeather);
@@ -326,6 +336,10 @@ function initializeSleep(){
   overlay.addEventListener('contextmenu',event=>event.preventDefault());
   // Escape/Enter provide a fallback when testing without a touchscreen.
   overlay.addEventListener('keydown',event=>{if(asleep&&['Enter','Escape',' '].includes(event.key)){event.preventDefault();void wakeDisplay();}});
+  for(const type of ['pointerdown','pointerup','touchend','keydown','wheel','input']){
+    document.addEventListener(type,resetIdleSleepTimer,{capture:true,passive:true});
+  }
+  resetIdleSleepTimer();
 }
 
 function eventListeners(){
