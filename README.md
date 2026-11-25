@@ -176,11 +176,10 @@ over HDMI, and some stop forwarding touch while in standby. In either case,
 PiCalendar falls back to the opaque black overlay; that overlay can still
 double-tap-wake, but the LCD backlight may remain lit.
 
-If backlight control is unavailable or cannot be written, the app automatically
-uses its black overlay. An HDMI monitor that doesn't expose a Linux backlight
-may need model-specific DDC/CI or hardware support. **Turning off the entire
-monitor or suspending the Pi is not a drop-in alternative**, since those can
-stop delivery of touch gestures.
+If the selected hardware control is unavailable or fails, the app keeps
+the opaque black overlay. DDC/CI power control varies by monitor; do not use the
+monitor's physical power button or suspend the Pi for this feature, because
+either can stop touch delivery and prevent double-tap wake.
 
 If you configure an unsuitable backlight and can no longer wake by touch, attach
 a keyboard and press Escape; if the light is physically stuck off, restore it
