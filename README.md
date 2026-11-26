@@ -77,6 +77,7 @@ If `unzip` isn't installed: `sudo apt-get install unzip`. Don't run `unzip` in W
 | Shopping list | Add, check off, delete items |
 | Meal planning | Choose meals for any day; shows the selected day and the following four days |
 | Photo slideshow | Upload/remove photos from the touchscreen; rotates every 12 seconds |
+| On-screen keyboard | Tap a text or number field in a PiCalendar dialog to type. Tap Done to hide the keyboard. Google sign-in uses the browser's system keyboard. |
 | Weather (optional) | Local weather from Open-Meteo, using your latitude/longitude |
 | Full-screen kiosk | Starts Chromium on boot after your Raspberry Pi OS desktop login |
 | Display sleep and wake | The display sleeps after 10 minutes of inactivity. Tap ⏻ to sleep immediately or double tap the screen to wake. Compatible screens can also turn off the backlight. |

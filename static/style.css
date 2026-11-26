@@ -16,6 +16,16 @@
 #sleep-overlay:focus{outline:none}
 body.screen-sleeping #app,body.screen-sleeping #toast{visibility:hidden}
 
+.dialog[open]:has(>.touch-keyboard){display:flex;flex-direction:column;overflow:hidden}
+.dialog:has(>.touch-keyboard) .dialog-form{min-height:0}
+.touch-keyboard{flex:none;display:grid;gap:4px;padding:8px;background:var(--panel2);border-top:1px solid var(--line);user-select:none}
+.touch-keyboard-row{display:flex;justify-content:center;gap:4px}
+.touch-keyboard-row button{flex:1;min-width:0;min-height:clamp(28px,7dvh,44px);border:1px solid var(--line);border-radius:6px;background:var(--panel3);color:var(--text);padding:0 2px;font-size:clamp(13px,3vw,18px)}
+.touch-keyboard-row button:is(:active,[aria-pressed="true"]){background:var(--accent);color:var(--bg)}
+.touch-keyboard-row button:disabled{opacity:.45}
+.touch-keyboard-controls button{font-size:clamp(12px,2.6vw,15px)}
+.touch-keyboard-numeric .touch-keyboard-row{width:min(100%,240px);margin-inline:auto}
+
 /* 0.3.1 animated month/week transition: viewport prevents panels sliding over sidebar */
 .calendar-viewport{position:relative;display:flex;flex:1;min-height:0;overflow:hidden;isolation:isolate}
 .calendar-viewport > .calendar-grid{width:100%;height:100%;min-height:0;flex:1;will-change:transform}
