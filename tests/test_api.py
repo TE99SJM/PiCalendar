@@ -81,3 +81,15 @@ def test_settings_and_filtering():
         assert client.get('/api/weather').json()['configured'] is False
         assert client.put('/api/settings',json={**settings,'weather_latitude':'999'}).status_code==422
         assert client.patch('/api/calendars/local?selected=false').status_code==422
+
+
+def test_theme_persists_and_older_settings_requests_preserve_it():
+    with TestClient(app) as client:
+        assert client.get('/api/settings').json()['theme'] == 'dark'
+        assert client.put('/api/settings', json={'theme': 'light'}).json()['theme'] == 'light'
+        assert client.put('/api/settings', json={'family_name': 'Family'}).json()['theme'] == 'light'
+        assert client.put('/api/settings', json={'theme': 'sepia'}).status_code == 422
+
+    with TestClient(app) as client:
+        assert client.get('/api/settings').json()['theme'] == 'light'
+        assert client.put('/api/settings', json={'theme': 'dark'}).json()['theme'] == 'dark'

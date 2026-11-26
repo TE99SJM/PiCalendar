@@ -81,6 +81,7 @@ def init_db() -> None:
         con.execute("INSERT OR IGNORE INTO calendars(id,name,color) VALUES('local','Family (local)','#8a72e8')")
         defaults = {
             'family_name': 'Our Family',
+            'theme': 'dark',
             'weather_location': '',
             'weather_latitude': '',
             'weather_longitude': '',

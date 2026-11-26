@@ -12,6 +12,7 @@ import uuid
 from contextlib import asynccontextmanager, suppress
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from typing import Literal
 from zoneinfo import ZoneInfo
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -120,6 +121,7 @@ class MealInput(BaseModel):
 
 class SettingsInput(BaseModel):
     family_name: str = Field(default='Our Family', min_length=1, max_length=70)
+    theme: Literal['light', 'dark'] | None = None
     weather_location: str = Field(default='', max_length=100)
     weather_latitude: str = ''
     weather_longitude: str = ''
@@ -237,7 +239,7 @@ def settings_get():
 
 @app.put('/api/settings')
 def settings_put(value: SettingsInput):
-    values = value.model_dump()
+    values = value.model_dump(exclude_none=True)
     for key, limits in (('weather_latitude', (-90, 90)), ('weather_longitude', (-180, 180))):
         if values[key]:
             try:

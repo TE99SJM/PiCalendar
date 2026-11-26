@@ -33,6 +33,7 @@ async function getEverything(){
     api(`/api/meals?start=${start}&end=${end}`),api('/api/calendars'),api('/api/settings'),
     api('/api/status'),api('/api/photos')]);
   Object.assign(state,{events,chores,groceries,meals,calendars,settings,status,photos});
+  renderTheme();
   renderAll();
 }
 async function loadEvents(){
@@ -194,6 +195,7 @@ function editMeal(day){
 }
 function renderSettings(){
   $('settings-family').value=state.settings.family_name||'Our Family';
+  $('settings-theme').value=state.settings.theme||'dark';
   $('weather-location').value=state.settings.weather_location||'';
   $('weather-latitude').value=state.settings.weather_latitude||'';
   $('weather-longitude').value=state.settings.weather_longitude||'';
@@ -211,6 +213,9 @@ function renderSettings(){
     </div>`;
   $('calendar-settings').innerHTML=state.calendars.map(c=>`<label class="cal-setting"><input type="checkbox" data-calendar="${esc(c.id)}" ${c.selected?'checked':''} ${c.id==='local'?'disabled':''}><span class="cal-dot" style="background:${validColor(c.color)}"></span>${esc(c.name)}${c.editable?'':' (read only)'}</label>`).join('');
   renderPhotoSettings();
+}
+function renderTheme(){
+  document.documentElement.dataset.theme=state.settings.theme||'dark';
 }
 function renderPhotoSettings(){
   $('photo-settings').innerHTML=state.photos.map(p=>`<div class="photo-preview"><img src="${esc(p.url)}" alt="Photo"><button type="button" data-photo-delete="${esc(p.filename)}" title="Remove photo">×</button></div>`).join('');
@@ -410,10 +415,10 @@ function eventListeners(){
     await getEverything();renderSettings();
   }));
   $('settings-form').addEventListener('submit',e=>run(async()=>{
-    e.preventDefault();const body={family_name:$('settings-family').value,weather_location:$('weather-location').value,
+    e.preventDefault();const body={family_name:$('settings-family').value,theme:$('settings-theme').value,weather_location:$('weather-location').value,
       weather_latitude:$('weather-latitude').value,weather_longitude:$('weather-longitude').value};
     state.settings=await api('/api/settings',{method:'PUT',body:JSON.stringify(body)});
-    hide('settings-dialog');renderStatus();renderWeather();toast('Settings saved.');
+    hide('settings-dialog');renderTheme();renderStatus();renderWeather();toast('Settings saved.');
   }));
   $('photo-upload').addEventListener('change',e=>run(async()=>{
     const files=[...e.target.files];if(!files.length)return;

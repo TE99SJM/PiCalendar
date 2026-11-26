@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#0d1727">
   <title>PiCalendar</title>
   <link rel="icon" type="image/png" href="/static/logo.png">
-  <link rel="stylesheet" href="/static/style.css?v=0.5.6-keyboard">
-  <script defer src="/static/app.js?v=0.5.6"></script>
+  <link rel="stylesheet" href="/static/style.css?v=0.5.6-theme">
+  <script defer src="/static/app.js?v=0.5.6-theme"></script>
   <link rel="stylesheet" href="/static/touch-gestures.css?v=1.2.1">
   <script defer src="/static/touch-gestures.js?v=1.2.1"></script>
   <script defer src="/static/touch-keyboard.js?v=1"></script>
@@ -87,6 +87,7 @@
   <dialog id="settings-dialog" class="dialog settings-dialog"><form id="settings-form" class="dialog-form">
     <div class="dialog-head"><h2>⚙ Dashboard settings</h2><button type="button" class="close-btn" data-close="settings-dialog">×</button></div>
     <label>Display name<input id="settings-family" maxlength="70" required></label>
+    <label>Theme<select id="settings-theme"><option value="dark">Dark</option><option value="light">Light</option></select></label>
     <h3>Google Calendar</h3>
     <div id="google-connection" class="information-box"></div>
     <div id="calendar-settings" class="calendar-settings"></div>

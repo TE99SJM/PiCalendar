@@ -127,3 +127,45 @@ html, body, body *, button, a, input, textarea, select, [role="button"] {
 
 /* v0.5.6: keep adjacent-month dates blank while preserving the 6-week grid. */
 .day-cell.empty{background:transparent;border-color:transparent;pointer-events:none}
+
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#eaf1f8;
+  --panel:#fff;
+  --panel2:#f2f6fb;
+  --panel3:#e5eef8;
+  --line:#c2d1e0;
+  --text:#15273b;
+  --muted:#4f6279;
+  --accent:#235e9a;
+  --accent2:#1d507e;
+  --green:#176148;
+  --red:#a32336;
+}
+:where(:root[data-theme="light"]) #app{background:radial-gradient(circle at 80% -10%,#d7e8f8 0,transparent 37%),var(--bg)}
+:where(:root[data-theme="light"]) .btn-primary,
+:where(:root[data-theme="light"]) .touch-keyboard-row button:is(:active,[aria-pressed="true"]){color:#fff}
+:where(:root[data-theme="light"]) .btn-danger{background:#fbe5e9;color:#8f2332}
+:where(:root[data-theme="light"]) .view-controls,
+:where(:root[data-theme="light"]) .day-cell:not(.empty){background:var(--panel2)}
+:where(:root[data-theme="light"]) .view-btn.active,
+:where(:root[data-theme="light"]) .day-cell.selected{background:#d8e9f9}
+:where(:root[data-theme="light"]) .day-cell.selected{border-color:#4278ad}
+:where(:root[data-theme="light"]) .day-cell.today .day-number{background:var(--accent);color:#fff}
+:where(:root[data-theme="light"]) .event-pill{background:#dceafb;border-left-color:var(--accent)}
+:where(:root[data-theme="light"]) .eyebrow{color:var(--accent2)}
+:where(:root[data-theme="light"]) .small-action{border-color:var(--line)}
+:where(:root[data-theme="light"]) .delete-small{color:var(--muted)}
+:where(:root[data-theme="light"]) .task-row input{background:var(--panel);border-color:#788b9e}
+:where(:root[data-theme="light"]) .task-row input:checked{background:var(--green);border-color:var(--green)}
+:where(:root[data-theme="light"]) .task-row input:checked::before{color:#fff}
+:where(:root[data-theme="light"]) .photo-container{background:var(--panel2)}
+:where(:root[data-theme="light"]) .dialog{background:var(--panel);border-color:var(--line)}
+:where(:root[data-theme="light"]) .dialog::backdrop{background:#20364f66}
+:where(:root[data-theme="light"]) .dialog label:not(.checkline):not(.upload-zone){color:var(--text)}
+:where(:root[data-theme="light"]) .dialog :is(input:not([type=checkbox]):not([type=file]),textarea,select){
+  background:var(--panel);
+  border-color:#788b9e;
+}
+:where(:root[data-theme="light"]) .dialog input[type=checkbox]{accent-color:var(--accent)}
+:where(:root[data-theme="light"]) .google-error{color:var(--red)}
